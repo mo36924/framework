@@ -9,5 +9,5 @@ it("babel-plugin-import-meta-url", async () => {
     plugins: [plugin],
   });
 
-  expect(result!.code).toMatchInlineSnapshot(`"console.log(require(\\"url\\").pathToFileURL(__filename));"`);
+  expect(result).toMatchInlineSnapshot(`console.log(require("url").pathToFileURL(__filename));`);
 });

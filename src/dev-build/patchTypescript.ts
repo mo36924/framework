@@ -1,9 +1,9 @@
+import type { CompilerHost, CompilerOptions, CreateProgramOptions, Diagnostic, Program } from "typescript";
 import { babelTransformFile } from "./babelTransformFile";
 import { scriptRegExp, testRegExp } from "./config";
 import { queue } from "./queue";
-import { relativeResolveTransformerFactory } from "./relativeResolveTransformer";
+import { resolveTransformerFactory } from "./resolveTransformer";
 import type typescript from "./typescript";
-import type { CompilerHost, CompilerOptions, CreateProgramOptions, Diagnostic, Program } from "typescript";
 import { writeFile } from "./writeFile";
 
 function createCreateProgramOptions(
@@ -38,7 +38,8 @@ export function patchTypescript(ts: typeof typescript) {
 
     program.emit = (targetSourceFile, writeFile, cancellationToken, emitOnlyDtsFiles, _customTransformers) => {
       return emit(targetSourceFile, writeFile, cancellationToken, emitOnlyDtsFiles, {
-        after: [relativeResolveTransformerFactory],
+        after: [resolveTransformerFactory as any],
+        afterDeclarations: [resolveTransformerFactory],
       });
     };
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+import "#types";
 import { patchTypescript } from "./patchTypescript";
 import ts from "./typescript";
 

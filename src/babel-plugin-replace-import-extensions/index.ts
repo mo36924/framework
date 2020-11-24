@@ -1,9 +1,8 @@
 import type { default as babel, NodePath, PluginObj, types as t } from "@babel/core";
 
-export default function babelPluginReplaceImportExtensions(
-  { types: t }: typeof babel,
-  options: { [ext: string]: string },
-): PluginObj {
+type Options = { [ext: string]: string };
+
+export default ({ types: t }: typeof babel, options: Options): PluginObj => {
   const extEntries = Object.entries(options);
 
   const replaceImportExtension = (path: string) => {
@@ -15,7 +14,7 @@ export default function babelPluginReplaceImportExtensions(
   };
 
   const transformDeclaration = (
-    path: NodePath<t.ImportDeclaration> | NodePath<t.ExportAllDeclaration> | NodePath<t.ExportNamedDeclaration>,
+    path: NodePath<t.ImportDeclaration> | NodePath<t.ExportAllDeclaration> | NodePath<t.ExportNamedDeclaration>
   ) => {
     const source = path.get("source");
 
@@ -59,4 +58,4 @@ export default function babelPluginReplaceImportExtensions(
       },
     },
   };
-}
+};

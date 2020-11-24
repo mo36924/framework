@@ -1,6 +1,8 @@
-import { relative, dirname } from "path";
-import type { Node, SourceFile, TransformerFactory, ResolvedModuleFull, StringLiteralLike } from "typescript";
+import path from "path";
+import type { Node, SourceFile, TransformerFactory, ResolvedModuleFull, StringLiteralLike, Bundle } from "typescript";
 import ts from "./typescript";
+
+const { relative, dirname } = path.posix;
 
 type ResolvedModules = Map<string, ResolvedModuleFull>;
 type _Node = Node;
@@ -12,8 +14,11 @@ declare module "typescript" {
   function isImportKeyword(node: _Node): boolean;
 }
 
-function relativeResolveModuleSpecifier(sf: SourceFile, path: string) {
-  if (!path.startsWith(".")) {
+function resolveModuleSpecifier(sf: SourceFile, path: string) {
+  if (/^[A-Za-z@]/.test(path)) {
+    return;
+  }
+  if (!sf.isDeclarationFile && path[0] === "#") {
     return;
   }
 
@@ -28,12 +33,15 @@ function relativeResolveModuleSpecifier(sf: SourceFile, path: string) {
   if (!moduleSpecifier.startsWith(".")) {
     moduleSpecifier = `./${moduleSpecifier}`;
   }
+  if (sf.isDeclarationFile) {
+    moduleSpecifier = moduleSpecifier.replace(/(\/index)?\.tsx?/, "");
+  }
 
   return moduleSpecifier;
 }
 
-export const relativeResolveTransformerFactory: TransformerFactory<SourceFile> = (ctx) => (sf) => {
-  if (sf.isDeclarationFile) {
+export const resolveTransformerFactory: TransformerFactory<SourceFile | Bundle> = (ctx) => (sf) => {
+  if (ts.isBundle(sf)) {
     return sf;
   }
 
@@ -44,7 +52,7 @@ export const relativeResolveTransformerFactory: TransformerFactory<SourceFile> =
       (ts.isImportDeclaration(node) || ts.isExportDeclaration(node)) &&
       node.moduleSpecifier &&
       ts.isStringLiteral(node.moduleSpecifier) &&
-      (moduleSpecifier = relativeResolveModuleSpecifier(sf, node.moduleSpecifier.text))
+      (moduleSpecifier = resolveModuleSpecifier(sf, node.moduleSpecifier.text))
     ) {
       if (ts.isImportDeclaration(node)) {
         return ctx.factory.updateImportDeclaration(
@@ -71,7 +79,7 @@ export const relativeResolveTransformerFactory: TransformerFactory<SourceFile> =
       ts.isImportKeyword(node.expression) &&
       node.arguments.length === 1 &&
       ts.isStringLiteralLike(node.arguments[0]) &&
-      (moduleSpecifier = relativeResolveModuleSpecifier(sf, (node.arguments[0] as StringLiteralLike).text))
+      (moduleSpecifier = resolveModuleSpecifier(sf, (node.arguments[0] as StringLiteralLike).text))
     ) {
       return ctx.factory.updateCallExpression(node, node.expression, node.typeArguments, [
         ctx.factory.createStringLiteral(moduleSpecifier),

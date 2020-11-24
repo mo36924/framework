@@ -1,11 +1,11 @@
 import { transformAsync, TransformOptions } from "@babel/core";
 import { test, expect } from "@jest/globals";
-import cssTaggedTemplate from "./index";
+import plugin from "./index";
 
 const options: TransformOptions = {
   babelrc: false,
   configFile: false,
-  plugins: [[cssTaggedTemplate, {}]],
+  plugins: [[plugin]],
 };
 
 const transform = (code: string) => transformAsync(code, options);
@@ -18,21 +18,21 @@ test("babel-plugin-css-tagged-template", async () => {
   `);
 
   expect(result).toMatchInlineSnapshot(`
-    import { css as _css } from "framework";
+    import { css as _css } from "@mo36924/framework";
 
     const _css2 = _css(
       typeof self === "undefined"
-        ? (_0) => [
-            [\`.\${_0}{width:10px}\`],
-            [\`.\${_0}{width:10px}\`],
-            [\`.\${_0}{width:10px}\`],
-          ]
+        ? (_0) => ({
+            modern: \`.\${_0}{width:10px}\`,
+            module: \`.\${_0}{width:10px}\`,
+            nomodule: \`.\${_0}{width:10px}\`,
+          })
         : typeof __MODERN__ !== "undefined"
         ? (_0) => [\`.\${_0}{width:10px}\`]
         : typeof __MODULE__ !== "undefined"
         ? (_0) => [\`.\${_0}{width:10px}\`]
         : (_0) => [\`.\${_0}{width:10px}\`],
-      "zfm5Ii6Tnh0="
+      "zfm5Ii6T"
     );
 
     _css2();
@@ -47,21 +47,21 @@ test("babel-plugin-css-tagged-template", async () => {
   `);
 
   expect(result).toMatchInlineSnapshot(`
-    import { css as _css } from "framework";
+    import { css as _css } from "@mo36924/framework";
 
     const _css2 = _css(
       typeof self === "undefined"
-        ? (_0) => [
-            [\`.\${_0}{width:10px}\`],
-            [\`.\${_0}{width:10px}\`],
-            [\`.\${_0}{width:10px}\`],
-          ]
+        ? (_0) => ({
+            modern: \`.\${_0}{width:10px}\`,
+            module: \`.\${_0}{width:10px}\`,
+            nomodule: \`.\${_0}{width:10px}\`,
+          })
         : typeof __MODERN__ !== "undefined"
         ? (_0) => [\`.\${_0}{width:10px}\`]
         : typeof __MODULE__ !== "undefined"
         ? (_0) => [\`.\${_0}{width:10px}\`]
         : (_0) => [\`.\${_0}{width:10px}\`],
-      "zfm5Ii6Tnh0="
+      "zfm5Ii6T"
     );
 
     function a() {
@@ -79,21 +79,21 @@ test("babel-plugin-css-tagged-template", async () => {
   `);
 
   expect(result).toMatchInlineSnapshot(`
-    import { css as _css } from "framework";
+    import { css as _css } from "@mo36924/framework";
 
     const _css2 = _css(
       typeof self === "undefined"
-        ? (_0, _1) => [
-            [\`.\${_0}{height:\${_1}px;width:10px}\`],
-            [\`.\${_0}{height:\${_1}px;width:10px}\`],
-            [\`.\${_0}{height:\${_1}px;width:10px}\`],
-          ]
+        ? (_0, _1) => ({
+            modern: \`.\${_0}{height:\${_1}px;width:10px}\`,
+            module: \`.\${_0}{height:\${_1}px;width:10px}\`,
+            nomodule: \`.\${_0}{height:\${_1}px;width:10px}\`,
+          })
         : typeof __MODERN__ !== "undefined"
         ? (_0, _1) => [\`.\${_0}{height:\${_1}px;width:10px}\`]
         : typeof __MODULE__ !== "undefined"
         ? (_0, _1) => [\`.\${_0}{height:\${_1}px;width:10px}\`]
         : (_0, _1) => [\`.\${_0}{height:\${_1}px;width:10px}\`],
-      "WSOlo8TZK6A="
+      "WSOlo8TZ"
     );
 
     function a(b) {
@@ -118,36 +118,36 @@ test("babel-plugin-css-tagged-template", async () => {
   `);
 
   expect(result).toMatchInlineSnapshot(`
-    import { css as _css } from "framework";
+    import { css as _css } from "@mo36924/framework";
 
     const _css2 = _css(
       typeof self === "undefined"
-        ? (_0, _1) => [
-            [\`.\${_0}{height:\${_1}px;width:10px}\`],
-            [\`.\${_0}{height:\${_1}px;width:10px}\`],
-            [\`.\${_0}{height:\${_1}px;width:10px}\`],
-          ]
+        ? (_0, _1) => ({
+            modern: \`.\${_0}{height:\${_1}px;width:10px}\`,
+            module: \`.\${_0}{height:\${_1}px;width:10px}\`,
+            nomodule: \`.\${_0}{height:\${_1}px;width:10px}\`,
+          })
         : typeof __MODERN__ !== "undefined"
         ? (_0, _1) => [\`.\${_0}{height:\${_1}px;width:10px}\`]
         : typeof __MODULE__ !== "undefined"
         ? (_0, _1) => [\`.\${_0}{height:\${_1}px;width:10px}\`]
         : (_0, _1) => [\`.\${_0}{height:\${_1}px;width:10px}\`],
-      "WSOlo8TZK6A="
+      "WSOlo8TZ"
     );
 
     const _css3 = _css(
       typeof self === "undefined"
-        ? (_0, _1, _2) => [
-            [\`.\${_0}{height:\${_2}px;width:\${_1}px}\`],
-            [\`.\${_0}{height:\${_2}px;width:\${_1}px}\`],
-            [\`.\${_0}{height:\${_2}px;width:\${_1}px}\`],
-          ]
+        ? (_0, _1, _2) => ({
+            modern: \`.\${_0}{height:\${_2}px;width:\${_1}px}\`,
+            module: \`.\${_0}{height:\${_2}px;width:\${_1}px}\`,
+            nomodule: \`.\${_0}{height:\${_2}px;width:\${_1}px}\`,
+          })
         : typeof __MODERN__ !== "undefined"
         ? (_0, _1, _2) => [\`.\${_0}{height:\${_2}px;width:\${_1}px}\`]
         : typeof __MODULE__ !== "undefined"
         ? (_0, _1, _2) => [\`.\${_0}{height:\${_2}px;width:\${_1}px}\`]
         : (_0, _1, _2) => [\`.\${_0}{height:\${_2}px;width:\${_1}px}\`],
-      "vEKpkqOFzME="
+      "vEKpkqOF"
     );
 
     function a(b) {
@@ -172,30 +172,21 @@ test("babel-plugin-css-tagged-template", async () => {
   `);
 
   expect(result).toMatchInlineSnapshot(`
-    import { css as _css } from "framework";
+    import { css as _css } from "@mo36924/framework";
 
     const _css2 = _css(
       typeof self === "undefined"
-        ? (_0, _1, _2) => [
-            [\`.\${_0}{height:\${_1}px;width:10px}\`, \`.\${_0}:before{width:\${_2}px}\`],
-            [\`.\${_0}{height:\${_1}px;width:10px}\`, \`.\${_0}:before{width:\${_2}px}\`],
-            [\`.\${_0}{height:\${_1}px;width:10px}\`, \`.\${_0}:before{width:\${_2}px}\`],
-          ]
+        ? (_0, _1, _2) => ({
+            modern: \`.\${_0}{height:\${_1}px;width:10px}.\${_0}:before{width:\${_2}px}\`,
+            module: \`.\${_0}{height:\${_1}px;width:10px}.\${_0}:before{width:\${_2}px}\`,
+            nomodule: \`.\${_0}{height:\${_1}px;width:10px}.\${_0}:before{width:\${_2}px}\`,
+          })
         : typeof __MODERN__ !== "undefined"
-        ? (_0, _1, _2) => [
-            \`.\${_0}{height:\${_1}px;width:10px}\`,
-            \`.\${_0}:before{width:\${_2}px}\`,
-          ]
+        ? (_0, _1, _2) => [\`.\${_0}{height:\${_1}px;width:10px}\`, \`.\${_0}:before{width:\${_2}px}\`]
         : typeof __MODULE__ !== "undefined"
-        ? (_0, _1, _2) => [
-            \`.\${_0}{height:\${_1}px;width:10px}\`,
-            \`.\${_0}:before{width:\${_2}px}\`,
-          ]
-        : (_0, _1, _2) => [
-            \`.\${_0}{height:\${_1}px;width:10px}\`,
-            \`.\${_0}:before{width:\${_2}px}\`,
-          ],
-      "jUdhaQWZX8A="
+        ? (_0, _1, _2) => [\`.\${_0}{height:\${_1}px;width:10px}\`, \`.\${_0}:before{width:\${_2}px}\`]
+        : (_0, _1, _2) => [\`.\${_0}{height:\${_1}px;width:10px}\`, \`.\${_0}:before{width:\${_2}px}\`],
+      "nVoEBgcG"
     );
 
     function a(b) {

@@ -1,22 +1,39 @@
+import "#types";
 import type { default as babel, PluginObj } from "@babel/core";
-import { modern, module, nomodule } from "../browserslists";
 import cssnanoPresetAdvanced from "cssnano-preset-advanced";
-import postcss, { Transformer } from "postcss";
+import postcss, { Transformer, Plugin } from "postcss";
 import nested from "postcss-nested";
-import "./module";
+import * as browserslists from "#browserslists";
+import { createHash } from "crypto";
+import { packageName } from "#constants";
+import { objectMap } from "#utils/objectMap";
 
 export type Options = {
   tags?: string[];
   pragma?: string;
   importSource?: string;
 };
+
 type State = {
   name: string;
   statements: babel.types.Statement[];
 };
 
-const plugins = (browserslist: string[]) => {
-  const preset = cssnanoPresetAdvanced({ autoprefixer: { overrideBrowserslist: browserslist } });
+type Types = keyof typeof browserslists;
+
+export type NodeCssFactory = (
+  className: string,
+  ...values: any[]
+) => {
+  [type in Types]: string;
+};
+
+export type CssFactory = (className: string, ...values: any[]) => string[];
+
+const getPlugins = (browserslist: string[]) => {
+  const preset: { plugins: [Plugin<{}>, any][] } = cssnanoPresetAdvanced({
+    autoprefixer: { overrideBrowserslist: browserslist },
+  });
   const nestedPlugin = nested();
   const asyncPlugins = ["postcss-svgo"];
 
@@ -26,12 +43,7 @@ const plugins = (browserslist: string[]) => {
 
   return [nestedPlugin, ...cssnanoPlugins];
 };
-
-const modernPlugins = plugins(modern);
-
-const modulePlugins = plugins(module);
-
-const nomodulePlugins = plugins(nomodule);
+const browserslistsPlugins = objectMap(browserslists, (browserslist) => getPlugins(browserslist));
 
 const splitRulePlugin = postcss.plugin<{ separator: string }>(
   "postcss-split-rule",
@@ -55,20 +67,24 @@ const templateCss = (styles: string[], wrapper = "_") => {
   return uncompiledCss;
 };
 
-const compileCss = (uncompiledCss: string, plugins: Transformer[] = modernPlugins, separator: string = "\n") =>
-  postcss([...plugins, splitRulePlugin({ separator })])
+const compileCss = (
+  uncompiledCss: string,
+  plugins: Transformer[] = browserslistsPlugins.modern,
+  separator: string = ""
+) =>
+  postcss(separator ? [...plugins, splitRulePlugin({ separator })] : plugins)
     .process(uncompiledCss)
     .toString();
 
-const compileRules = (uncompiledCss: string, plugins: Transformer[] = modernPlugins, separator: string = "\n") =>
-  compileCss(uncompiledCss, plugins, separator).split(separator);
-
-const cacheKeys: { [cacheKey: string]: number } = Object.create(null);
-let i = 0;
+const compileRules = (
+  uncompiledCss: string,
+  plugins: Transformer[] = browserslistsPlugins.modern,
+  separator: string = ""
+) => compileCss(uncompiledCss, plugins, separator).split(separator);
 
 export default (
   { types: t }: typeof babel,
-  { tags = ["css"], pragma = "css", importSource = "@mo36924/core" }: Options
+  { tags = ["css"], pragma = "css", importSource = packageName }: Options
 ): PluginObj<State> => {
   return {
     name: "css-tagged-template",
@@ -103,64 +119,67 @@ export default (
 
         const styles = quasi.quasis.map(({ value: { cooked, raw } }) => cooked ?? raw);
         const css = compileCss(templateCss(styles));
-        const cacheKey = (cacheKeys[css] ??= i++);
+        const hash = createHash("shake128", { outputLength: 6 }).update(css).digest("base64");
         const wrapperLength = css.length;
         const wrapper = "_".repeat(wrapperLength);
         const trimWrapper = (str: string) => str.slice(wrapperLength, -wrapperLength);
         const wrapRegexp = new RegExp(`${wrapper}\\d+${wrapper}`, "g");
         const separator = `/*${"*".repeat(wrapperLength)}*/`;
         const uncompiledCss = templateCss(styles, wrapper);
+        const params = styles.map((_, i) => t.identifier(`_${i}`));
+        const nodeCssFactory = t.arrowFunctionExpression(
+          params,
+          t.objectExpression(
+            Object.entries(browserslistsPlugins).map(([type, plugins]) => {
+              const css = compileCss(uncompiledCss, plugins, "");
+              const quasis = css
+                .split(wrapRegexp)
+                .map((str, index, array) => t.templateElement({ raw: str }, index === array.length - 1));
 
-        const arrayExpressions = [modernPlugins, modulePlugins, nomodulePlugins].map((plugins) => {
+              const expressions = (css.match(wrapRegexp) || []).map((m) => t.identifier(`_${trimWrapper(m)}`));
+              return t.objectProperty(t.identifier(type), t.templateLiteral(quasis, expressions));
+            })
+          )
+        );
+        const rulesFactories = objectMap(browserslistsPlugins, (plugins) => {
           const rules = compileRules(uncompiledCss, plugins, separator);
-
           const templates = rules.map((rule) => {
             const quasis = rule
               .split(wrapRegexp)
-              .map((str, index, self) => t.templateElement({ raw: str }, index === self.length - 1));
+              .map((str, index, array) => t.templateElement({ raw: str }, index === array.length - 1));
 
             const expressions = (rule.match(wrapRegexp) || []).map((m) => t.identifier(`_${trimWrapper(m)}`));
             return t.templateLiteral(quasis, expressions);
           });
-
-          return t.arrayExpression(templates);
+          const arrayExpression = t.arrayExpression(templates);
+          return t.arrowFunctionExpression(params, arrayExpression);
         });
-
-        const params = styles.map((_, i) => t.identifier(`_${i}`));
-        const nodeRulesFactory = t.arrowFunctionExpression(params, t.arrayExpression(arrayExpressions));
-
-        const [modernRulesFactory, moduleRulesFactory, nomoduleRulesFactory] = arrayExpressions.map((arrayExpression) =>
-          t.arrowFunctionExpression(params, arrayExpression)
-        );
-
-        const id = path.scope.generateUidIdentifier("css");
 
         const conditional = t.conditionalExpression(
           t.binaryExpression("===", t.unaryExpression("typeof", t.identifier("self")), t.stringLiteral("undefined")),
-          nodeRulesFactory,
+          nodeCssFactory,
           t.conditionalExpression(
             t.binaryExpression(
               "!==",
               t.unaryExpression("typeof", t.identifier("__MODERN__")),
               t.stringLiteral("undefined")
             ),
-            modernRulesFactory,
+            rulesFactories.modern,
             t.conditionalExpression(
               t.binaryExpression(
                 "!==",
                 t.unaryExpression("typeof", t.identifier("__MODULE__")),
                 t.stringLiteral("undefined")
               ),
-              moduleRulesFactory,
-              nomoduleRulesFactory
+              rulesFactories.module,
+              rulesFactories.nomodule
             )
           )
         );
 
-        const key = t.numericLiteral(cacheKey);
-
+        const id = path.scope.generateUidIdentifier("css");
+        const key = t.stringLiteral(hash);
         path.replaceWith(t.callExpression(id, quasi.expressions as any));
-
         state.statements.push(
           t.variableDeclaration("const", [
             t.variableDeclarator(id, t.callExpression(t.identifier(state.name), [conditional, key])),

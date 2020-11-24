@@ -1,6 +1,6 @@
 {
   "name": "@mo36924/framework",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Web framework for Node.js",
   "keywords": [],
   "author": "mo36924 <mo36924@users.noreply.github.com>",
@@ -16,34 +16,1207 @@
   "publishConfig": {
     "access": "public"
   },
-  "main": "index.js",
-  "exports": {
-    ".": {
-      "import": "./core/index.mjs",
-      "require": "./core/index.js"
-    }
-  },
+  "main": "core/index.js",
+  "module": "core/index.mjs",
+  "browser": "core/index.mjs",
   "scripts": {
-    "build": "tsc",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "clean-build": "run-s clean build exports",
+    "build": "babel-node -x \".ts\" src/dev-build",
+    "watch": "babel-node -x \".ts\" src/dev-build --watch",
+    "exports": "babel-node -x \".ts\" src/dev-exports",
+    "clean": "babel-node -x \".ts\" src/dev-clean",
+    "test": "jest"
   },
   "prettier": {
     "printWidth": 120
   },
+  "babel": {
+    "presets": [
+      [
+        "@babel/preset-env",
+        {
+          "bugfixes": true,
+          "targets": {
+            "node": true
+          }
+        }
+      ],
+      [
+        "@babel/preset-typescript",
+        {}
+      ],
+      [
+        "@babel/preset-react",
+        {
+          "runtime": "automatic",
+          "importSource": "preact"
+        }
+      ]
+    ],
+    "plugins": [
+      [
+        "babel-plugin-module-resolver",
+        {
+          "alias": {
+            "^#(.+)": "./src/\\1"
+          }
+        }
+      ]
+    ]
+  },
+  "jest": {
+    "projects": [
+      {
+        "preset": "ts-jest",
+        "displayName": "server",
+        "testEnvironment": "node",
+        "moduleNameMapper": {
+          "^#/(.*)$": "<rootDir>/src/$1"
+        },
+        "testMatch": [
+          "**/__tests__/**/*.[jt]s?(x)",
+          "**/?(*.)+(spec|test).[jt]s?(x)",
+          "!**/?(*.)browser.+(spec|test).[jt]s?(x)"
+        ],
+        "moduleFileExtensions": [
+          "tsx",
+          "ts",
+          "jsx",
+          "js",
+          "mjs",
+          "json",
+          "node"
+        ],
+        "snapshotSerializers": [
+          "<rootDir>/src/jest-snapshot-serializer-babel/index.ts",
+          "<rootDir>/src/jest-snapshot-serializer-graphql/index.ts",
+          "<rootDir>/src/jest-snapshot-serializer-preact/index.ts"
+        ]
+      },
+      {
+        "preset": "ts-jest",
+        "displayName": "browser",
+        "testEnvironment": "jsdom",
+        "moduleNameMapper": {
+          "^#/(.*)$": "<rootDir>/src/$1"
+        },
+        "testMatch": [
+          "**/?(*.)browser.+(spec|test).[jt]s?(x)"
+        ],
+        "moduleFileExtensions": [
+          "tsx",
+          "ts",
+          "jsx",
+          "js",
+          "mjs",
+          "json"
+        ],
+        "snapshotSerializers": [
+          "<rootDir>/src/jest-snapshot-serializer-babel/index.ts",
+          "<rootDir>/src/jest-snapshot-serializer-graphql/index.ts",
+          "<rootDir>/src/jest-snapshot-serializer-preact/index.ts"
+        ]
+      }
+    ]
+  },
   "dependencies": {
     "@babel/core": "7.12.3",
+    "@babel/node": "7.12.6",
     "@babel/preset-env": "7.12.1",
     "@babel/preset-react": "7.12.5",
+    "@babel/preset-typescript": "7.12.1",
+    "@rollup/plugin-babel": "5.2.1",
+    "@rollup/plugin-commonjs": "16.0.0",
+    "@rollup/plugin-typescript": "6.1.0",
     "@types/babel__core": "7.1.12",
     "@types/babel__preset-env": "7.9.1",
+    "@types/http-errors": "1.8.0",
+    "@types/jsesc": "2.5.1",
+    "@types/node-fetch": "2.5.7",
+    "babel-plugin-module-resolver": "4.0.0",
+    "change-case": "4.1.1",
+    "chokidar": "3.4.3",
+    "cosmiconfig": "7.0.0",
+    "cssnano-preset-advanced": "4.0.7",
     "del-cli": "3.0.1",
+    "enhanced-resolve": "5.3.1",
     "eslint": "7.13.0",
+    "fast-glob": "3.2.4",
+    "graphql": "15.4.0",
+    "http-errors": "1.8.0",
     "jest": "26.6.3",
+    "jsesc": "3.0.2",
+    "node-fetch": "2.6.1",
+    "npm-run-all": "4.1.5",
     "p-queue": "6.6.2",
     "postcss": "7.0.35",
     "postcss-nested": "4.2.3",
+    "preact": "10.5.7",
+    "preact-render-to-string": "5.1.12",
     "prettier": "2.1.2",
+    "rollup": "2.33.3",
+    "rollup-plugin-terser": "7.0.2",
     "ts-jest": "26.4.4",
     "typescript": "4.0.5"
+  },
+  "devDependencies": {},
+  "imports": {
+    "#babel-plugin-css-tagged-template": {
+      "browser": "./babel-plugin-css-tagged-template/index.mjs",
+      "import": "./babel-plugin-css-tagged-template/index.mjs",
+      "require": "./babel-plugin-css-tagged-template/index.js"
+    },
+    "#babel-plugin-css-tagged-template/index": {
+      "browser": "./babel-plugin-css-tagged-template/index.mjs",
+      "import": "./babel-plugin-css-tagged-template/index.mjs",
+      "require": "./babel-plugin-css-tagged-template/index.js"
+    },
+    "#babel-plugin-enhanced-resolve": {
+      "browser": "./babel-plugin-enhanced-resolve/index.mjs",
+      "import": "./babel-plugin-enhanced-resolve/index.mjs",
+      "require": "./babel-plugin-enhanced-resolve/index.js"
+    },
+    "#babel-plugin-enhanced-resolve/index": {
+      "browser": "./babel-plugin-enhanced-resolve/index.mjs",
+      "import": "./babel-plugin-enhanced-resolve/index.mjs",
+      "require": "./babel-plugin-enhanced-resolve/index.js"
+    },
+    "#babel-plugin-import-meta-url": {
+      "browser": "./babel-plugin-import-meta-url/index.mjs",
+      "import": "./babel-plugin-import-meta-url/index.mjs",
+      "require": "./babel-plugin-import-meta-url/index.js"
+    },
+    "#babel-plugin-import-meta-url/index": {
+      "browser": "./babel-plugin-import-meta-url/index.mjs",
+      "import": "./babel-plugin-import-meta-url/index.mjs",
+      "require": "./babel-plugin-import-meta-url/index.js"
+    },
+    "#babel-plugin-inject": {
+      "browser": "./babel-plugin-inject/index.mjs",
+      "import": "./babel-plugin-inject/index.mjs",
+      "require": "./babel-plugin-inject/index.js"
+    },
+    "#babel-plugin-inject/index": {
+      "browser": "./babel-plugin-inject/index.mjs",
+      "import": "./babel-plugin-inject/index.mjs",
+      "require": "./babel-plugin-inject/index.js"
+    },
+    "#babel-plugin-replace-expressions": {
+      "browser": "./babel-plugin-replace-expressions/index.mjs",
+      "import": "./babel-plugin-replace-expressions/index.mjs",
+      "require": "./babel-plugin-replace-expressions/index.js"
+    },
+    "#babel-plugin-replace-expressions/index": {
+      "browser": "./babel-plugin-replace-expressions/index.mjs",
+      "import": "./babel-plugin-replace-expressions/index.mjs",
+      "require": "./babel-plugin-replace-expressions/index.js"
+    },
+    "#babel-plugin-replace-import-extensions": {
+      "browser": "./babel-plugin-replace-import-extensions/index.mjs",
+      "import": "./babel-plugin-replace-import-extensions/index.mjs",
+      "require": "./babel-plugin-replace-import-extensions/index.js"
+    },
+    "#babel-plugin-replace-import-extensions/index": {
+      "browser": "./babel-plugin-replace-import-extensions/index.mjs",
+      "import": "./babel-plugin-replace-import-extensions/index.mjs",
+      "require": "./babel-plugin-replace-import-extensions/index.js"
+    },
+    "#babel-preset-framework": {
+      "browser": "./babel-preset-framework/index.mjs",
+      "import": "./babel-preset-framework/index.mjs",
+      "require": "./babel-preset-framework/index.js"
+    },
+    "#babel-preset-framework/index": {
+      "browser": "./babel-preset-framework/index.mjs",
+      "import": "./babel-preset-framework/index.mjs",
+      "require": "./babel-preset-framework/index.js"
+    },
+    "#browserslists": {
+      "browser": "./browserslists/index.mjs",
+      "import": "./browserslists/index.mjs",
+      "require": "./browserslists/index.js"
+    },
+    "#browserslists/index": {
+      "browser": "./browserslists/index.mjs",
+      "import": "./browserslists/index.mjs",
+      "require": "./browserslists/index.js"
+    },
+    "#build": {
+      "browser": "./build/index.mjs",
+      "import": "./build/index.mjs",
+      "require": "./build/index.js"
+    },
+    "#build/index": {
+      "browser": "./build/index.mjs",
+      "import": "./build/index.mjs",
+      "require": "./build/index.js"
+    },
+    "#cache": {
+      "browser": "./cache/index.mjs",
+      "import": "./cache/index.mjs",
+      "require": "./cache/index.js"
+    },
+    "#cache/index": {
+      "browser": "./cache/index.mjs",
+      "import": "./cache/index.mjs",
+      "require": "./cache/index.js"
+    },
+    "#changestate": {
+      "browser": "./changestate/index.browser.mjs",
+      "import": "./changestate/index.mjs",
+      "require": "./changestate/index.js"
+    },
+    "#changestate/index": {
+      "browser": "./changestate/index.browser.mjs",
+      "import": "./changestate/index.mjs",
+      "require": "./changestate/index.js"
+    },
+    "#components/Body": {
+      "browser": "./components/Body.browser.mjs",
+      "import": "./components/Body.mjs",
+      "require": "./components/Body.js"
+    },
+    "#components/Head": {
+      "browser": "./components/Head.browser.mjs",
+      "import": "./components/Head.mjs",
+      "require": "./components/Head.js"
+    },
+    "#components/Html": {
+      "browser": "./components/Html.browser.mjs",
+      "import": "./components/Html.mjs",
+      "require": "./components/Html.js"
+    },
+    "#components/Meta": {
+      "browser": "./components/Meta.browser.mjs",
+      "import": "./components/Meta.mjs",
+      "require": "./components/Meta.js"
+    },
+    "#components/Script": {
+      "browser": "./components/Script.browser.mjs",
+      "import": "./components/Script.mjs",
+      "require": "./components/Script.js"
+    },
+    "#components/Style": {
+      "browser": "./components/Style.browser.mjs",
+      "import": "./components/Style.mjs",
+      "require": "./components/Style.js"
+    },
+    "#components/Title": {
+      "browser": "./components/Title.browser.mjs",
+      "import": "./components/Title.mjs",
+      "require": "./components/Title.js"
+    },
+    "#config": {
+      "browser": "./config/index.mjs",
+      "import": "./config/index.mjs",
+      "require": "./config/index.js"
+    },
+    "#config/index": {
+      "browser": "./config/index.mjs",
+      "import": "./config/index.mjs",
+      "require": "./config/index.js"
+    },
+    "#constants": {
+      "browser": "./constants/index.mjs",
+      "import": "./constants/index.mjs",
+      "require": "./constants/index.js"
+    },
+    "#constants/index": {
+      "browser": "./constants/index.mjs",
+      "import": "./constants/index.mjs",
+      "require": "./constants/index.js"
+    },
+    "#context": {
+      "browser": "./context/index.mjs",
+      "import": "./context/index.mjs",
+      "require": "./context/index.js"
+    },
+    "#context/index": {
+      "browser": "./context/index.mjs",
+      "import": "./context/index.mjs",
+      "require": "./context/index.js"
+    },
+    "#core": {
+      "browser": "./core/index.mjs",
+      "import": "./core/index.mjs",
+      "require": "./core/index.js"
+    },
+    "#core/index": {
+      "browser": "./core/index.mjs",
+      "import": "./core/index.mjs",
+      "require": "./core/index.js"
+    },
+    "#css": {
+      "browser": "./css/index.browser.mjs",
+      "import": "./css/index.mjs",
+      "require": "./css/index.js"
+    },
+    "#css/index": {
+      "browser": "./css/index.browser.mjs",
+      "import": "./css/index.mjs",
+      "require": "./css/index.js"
+    },
+    "#dev-build/addSourceMappingURL": {
+      "browser": "./dev-build/addSourceMappingURL.mjs",
+      "import": "./dev-build/addSourceMappingURL.mjs",
+      "require": "./dev-build/addSourceMappingURL.js"
+    },
+    "#dev-build/babelTransformFile": {
+      "browser": "./dev-build/babelTransformFile.mjs",
+      "import": "./dev-build/babelTransformFile.mjs",
+      "require": "./dev-build/babelTransformFile.js"
+    },
+    "#dev-build/config": {
+      "browser": "./dev-build/config.mjs",
+      "import": "./dev-build/config.mjs",
+      "require": "./dev-build/config.js"
+    },
+    "#dev-build": {
+      "browser": "./dev-build/index.mjs",
+      "import": "./dev-build/index.mjs",
+      "require": "./dev-build/index.js"
+    },
+    "#dev-build/index": {
+      "browser": "./dev-build/index.mjs",
+      "import": "./dev-build/index.mjs",
+      "require": "./dev-build/index.js"
+    },
+    "#dev-build/patchTypescript": {
+      "browser": "./dev-build/patchTypescript.mjs",
+      "import": "./dev-build/patchTypescript.mjs",
+      "require": "./dev-build/patchTypescript.js"
+    },
+    "#dev-build/queue": {
+      "browser": "./dev-build/queue.mjs",
+      "import": "./dev-build/queue.mjs",
+      "require": "./dev-build/queue.js"
+    },
+    "#dev-build/resolveTransformer": {
+      "browser": "./dev-build/resolveTransformer.mjs",
+      "import": "./dev-build/resolveTransformer.mjs",
+      "require": "./dev-build/resolveTransformer.js"
+    },
+    "#dev-build/typescript": {
+      "browser": "./dev-build/typescript.mjs",
+      "import": "./dev-build/typescript.mjs",
+      "require": "./dev-build/typescript.js"
+    },
+    "#dev-build/writeFile": {
+      "browser": "./dev-build/writeFile.mjs",
+      "import": "./dev-build/writeFile.mjs",
+      "require": "./dev-build/writeFile.js"
+    },
+    "#dev-clean": {
+      "browser": "./dev-clean/index.mjs",
+      "import": "./dev-clean/index.mjs",
+      "require": "./dev-clean/index.js"
+    },
+    "#dev-clean/index": {
+      "browser": "./dev-clean/index.mjs",
+      "import": "./dev-clean/index.mjs",
+      "require": "./dev-clean/index.js"
+    },
+    "#dev-exports": {
+      "browser": "./dev-exports/index.mjs",
+      "import": "./dev-exports/index.mjs",
+      "require": "./dev-exports/index.js"
+    },
+    "#dev-exports/index": {
+      "browser": "./dev-exports/index.mjs",
+      "import": "./dev-exports/index.mjs",
+      "require": "./dev-exports/index.js"
+    },
+    "#fetch": {
+      "browser": "./fetch/index.browser.mjs",
+      "import": "./fetch/index.mjs",
+      "require": "./fetch/index.js"
+    },
+    "#fetch/index": {
+      "browser": "./fetch/index.browser.mjs",
+      "import": "./fetch/index.mjs",
+      "require": "./fetch/index.js"
+    },
+    "#graphql-client/body": {
+      "browser": "./graphql-client/body.mjs",
+      "import": "./graphql-client/body.mjs",
+      "require": "./graphql-client/body.js"
+    },
+    "#graphql-client/fetch": {
+      "browser": "./graphql-client/fetch.mjs",
+      "import": "./graphql-client/fetch.mjs",
+      "require": "./graphql-client/fetch.js"
+    },
+    "#graphql-client/get": {
+      "browser": "./graphql-client/get.mjs",
+      "import": "./graphql-client/get.mjs",
+      "require": "./graphql-client/get.js"
+    },
+    "#graphql-client/post": {
+      "browser": "./graphql-client/post.mjs",
+      "import": "./graphql-client/post.mjs",
+      "require": "./graphql-client/post.js"
+    },
+    "#graphql-client/querystring": {
+      "browser": "./graphql-client/querystring.mjs",
+      "import": "./graphql-client/querystring.mjs",
+      "require": "./graphql-client/querystring.js"
+    },
+    "#graphql-client/useMutation": {
+      "browser": "./graphql-client/useMutation.browser.mjs",
+      "import": "./graphql-client/useMutation.mjs",
+      "require": "./graphql-client/useMutation.js"
+    },
+    "#graphql-client/useQuery": {
+      "browser": "./graphql-client/useQuery.browser.mjs",
+      "import": "./graphql-client/useQuery.mjs",
+      "require": "./graphql-client/useQuery.js"
+    },
+    "#hooks/useForceUpdate": {
+      "browser": "./hooks/useForceUpdate.mjs",
+      "import": "./hooks/useForceUpdate.mjs",
+      "require": "./hooks/useForceUpdate.js"
+    },
+    "#http-server": {
+      "browser": "./http-server/index.mjs",
+      "import": "./http-server/index.mjs",
+      "require": "./http-server/index.js"
+    },
+    "#http-server/index": {
+      "browser": "./http-server/index.mjs",
+      "import": "./http-server/index.mjs",
+      "require": "./http-server/index.js"
+    },
+    "#hydrate": {
+      "browser": "./hydrate/index.mjs",
+      "import": "./hydrate/index.mjs",
+      "require": "./hydrate/index.js"
+    },
+    "#hydrate/index": {
+      "browser": "./hydrate/index.mjs",
+      "import": "./hydrate/index.mjs",
+      "require": "./hydrate/index.js"
+    },
+    "#jest-snapshot-serializer-babel": {
+      "browser": "./jest-snapshot-serializer-babel/index.mjs",
+      "import": "./jest-snapshot-serializer-babel/index.mjs",
+      "require": "./jest-snapshot-serializer-babel/index.js"
+    },
+    "#jest-snapshot-serializer-babel/index": {
+      "browser": "./jest-snapshot-serializer-babel/index.mjs",
+      "import": "./jest-snapshot-serializer-babel/index.mjs",
+      "require": "./jest-snapshot-serializer-babel/index.js"
+    },
+    "#jest-snapshot-serializer-graphql": {
+      "browser": "./jest-snapshot-serializer-graphql/index.mjs",
+      "import": "./jest-snapshot-serializer-graphql/index.mjs",
+      "require": "./jest-snapshot-serializer-graphql/index.js"
+    },
+    "#jest-snapshot-serializer-graphql/index": {
+      "browser": "./jest-snapshot-serializer-graphql/index.mjs",
+      "import": "./jest-snapshot-serializer-graphql/index.mjs",
+      "require": "./jest-snapshot-serializer-graphql/index.js"
+    },
+    "#jest-snapshot-serializer-preact": {
+      "browser": "./jest-snapshot-serializer-preact/index.mjs",
+      "import": "./jest-snapshot-serializer-preact/index.mjs",
+      "require": "./jest-snapshot-serializer-preact/index.js"
+    },
+    "#jest-snapshot-serializer-preact/index": {
+      "browser": "./jest-snapshot-serializer-preact/index.mjs",
+      "import": "./jest-snapshot-serializer-preact/index.mjs",
+      "require": "./jest-snapshot-serializer-preact/index.js"
+    },
+    "#jsx-runtime": {
+      "browser": "./jsx-runtime/index.browser.mjs",
+      "import": "./jsx-runtime/index.mjs",
+      "require": "./jsx-runtime/index.js"
+    },
+    "#jsx-runtime/index": {
+      "browser": "./jsx-runtime/index.browser.mjs",
+      "import": "./jsx-runtime/index.mjs",
+      "require": "./jsx-runtime/index.js"
+    },
+    "#lazy": {
+      "browser": "./lazy/index.browser.mjs",
+      "import": "./lazy/index.mjs",
+      "require": "./lazy/index.js"
+    },
+    "#lazy/index": {
+      "browser": "./lazy/index.browser.mjs",
+      "import": "./lazy/index.mjs",
+      "require": "./lazy/index.js"
+    },
+    "#preact-lock": {
+      "browser": "./preact-lock/index.mjs",
+      "import": "./preact-lock/index.mjs",
+      "require": "./preact-lock/index.js"
+    },
+    "#preact-lock/index": {
+      "browser": "./preact-lock/index.mjs",
+      "import": "./preact-lock/index.mjs",
+      "require": "./preact-lock/index.js"
+    },
+    "#prettier-module": {
+      "browser": "./prettier-module/index.mjs",
+      "import": "./prettier-module/index.mjs",
+      "require": "./prettier-module/index.js"
+    },
+    "#prettier-module/index": {
+      "browser": "./prettier-module/index.mjs",
+      "import": "./prettier-module/index.mjs",
+      "require": "./prettier-module/index.js"
+    },
+    "#render-to-string": {
+      "browser": "./render-to-string/index.mjs",
+      "import": "./render-to-string/index.mjs",
+      "require": "./render-to-string/index.js"
+    },
+    "#render-to-string/index": {
+      "browser": "./render-to-string/index.mjs",
+      "import": "./render-to-string/index.mjs",
+      "require": "./render-to-string/index.js"
+    },
+    "#route-generator": {
+      "browser": "./route-generator/index.mjs",
+      "import": "./route-generator/index.mjs",
+      "require": "./route-generator/index.js"
+    },
+    "#route-generator/index": {
+      "browser": "./route-generator/index.mjs",
+      "import": "./route-generator/index.mjs",
+      "require": "./route-generator/index.js"
+    },
+    "#store": {
+      "browser": "./store/index.browser.mjs",
+      "import": "./store/index.mjs",
+      "require": "./store/index.js"
+    },
+    "#store/index": {
+      "browser": "./store/index.browser.mjs",
+      "import": "./store/index.mjs",
+      "require": "./store/index.js"
+    },
+    "#types/global": {
+      "browser": "./types/global.mjs",
+      "import": "./types/global.mjs",
+      "require": "./types/global.js"
+    },
+    "#types/graphql": {
+      "browser": "./types/graphql.mjs",
+      "import": "./types/graphql.mjs",
+      "require": "./types/graphql.js"
+    },
+    "#types": {
+      "browser": "./types/index.mjs",
+      "import": "./types/index.mjs",
+      "require": "./types/index.js"
+    },
+    "#types/index": {
+      "browser": "./types/index.mjs",
+      "import": "./types/index.mjs",
+      "require": "./types/index.js"
+    },
+    "#types/jsx": {
+      "browser": "./types/jsx.mjs",
+      "import": "./types/jsx.mjs",
+      "require": "./types/jsx.js"
+    },
+    "#types/module": {
+      "browser": "./types/module.mjs",
+      "import": "./types/module.mjs",
+      "require": "./types/module.js"
+    },
+    "#types/preact": {
+      "browser": "./types/preact.mjs",
+      "import": "./types/preact.mjs",
+      "require": "./types/preact.js"
+    },
+    "#utils/createClassName": {
+      "browser": "./utils/createClassName.mjs",
+      "import": "./utils/createClassName.mjs",
+      "require": "./utils/createClassName.js"
+    },
+    "#utils/createObject": {
+      "browser": "./utils/createObject.mjs",
+      "import": "./utils/createObject.mjs",
+      "require": "./utils/createObject.js"
+    },
+    "#utils/createObjectNull": {
+      "browser": "./utils/createObjectNull.mjs",
+      "import": "./utils/createObjectNull.mjs",
+      "require": "./utils/createObjectNull.js"
+    },
+    "#utils/getElementById": {
+      "browser": "./utils/getElementById.mjs",
+      "import": "./utils/getElementById.mjs",
+      "require": "./utils/getElementById.js"
+    },
+    "#utils/memoizeMap": {
+      "browser": "./utils/memoizeMap.mjs",
+      "import": "./utils/memoizeMap.mjs",
+      "require": "./utils/memoizeMap.js"
+    },
+    "#utils/memoizeObject": {
+      "browser": "./utils/memoizeObject.mjs",
+      "import": "./utils/memoizeObject.mjs",
+      "require": "./utils/memoizeObject.js"
+    },
+    "#utils/memoizeWeakMap": {
+      "browser": "./utils/memoizeWeakMap.mjs",
+      "import": "./utils/memoizeWeakMap.mjs",
+      "require": "./utils/memoizeWeakMap.js"
+    },
+    "#utils/objectMap": {
+      "browser": "./utils/objectMap.mjs",
+      "import": "./utils/objectMap.mjs",
+      "require": "./utils/objectMap.js"
+    },
+    "#utils/once": {
+      "browser": "./utils/once.mjs",
+      "import": "./utils/once.mjs",
+      "require": "./utils/once.js"
+    },
+    "#variables": {
+      "browser": "./variables/index.mjs",
+      "import": "./variables/index.mjs",
+      "require": "./variables/index.js"
+    },
+    "#variables/index": {
+      "browser": "./variables/index.mjs",
+      "import": "./variables/index.mjs",
+      "require": "./variables/index.js"
+    }
+  },
+  "exports": {
+    ".": {
+      "browser": "./core/index.mjs",
+      "import": "./core/index.mjs",
+      "require": "./core/index.js"
+    },
+    "./babel-plugin-css-tagged-template": {
+      "browser": "./babel-plugin-css-tagged-template/index.mjs",
+      "import": "./babel-plugin-css-tagged-template/index.mjs",
+      "require": "./babel-plugin-css-tagged-template/index.js"
+    },
+    "./babel-plugin-css-tagged-template/index": {
+      "browser": "./babel-plugin-css-tagged-template/index.mjs",
+      "import": "./babel-plugin-css-tagged-template/index.mjs",
+      "require": "./babel-plugin-css-tagged-template/index.js"
+    },
+    "./babel-plugin-enhanced-resolve": {
+      "browser": "./babel-plugin-enhanced-resolve/index.mjs",
+      "import": "./babel-plugin-enhanced-resolve/index.mjs",
+      "require": "./babel-plugin-enhanced-resolve/index.js"
+    },
+    "./babel-plugin-enhanced-resolve/index": {
+      "browser": "./babel-plugin-enhanced-resolve/index.mjs",
+      "import": "./babel-plugin-enhanced-resolve/index.mjs",
+      "require": "./babel-plugin-enhanced-resolve/index.js"
+    },
+    "./babel-plugin-import-meta-url": {
+      "browser": "./babel-plugin-import-meta-url/index.mjs",
+      "import": "./babel-plugin-import-meta-url/index.mjs",
+      "require": "./babel-plugin-import-meta-url/index.js"
+    },
+    "./babel-plugin-import-meta-url/index": {
+      "browser": "./babel-plugin-import-meta-url/index.mjs",
+      "import": "./babel-plugin-import-meta-url/index.mjs",
+      "require": "./babel-plugin-import-meta-url/index.js"
+    },
+    "./babel-plugin-inject": {
+      "browser": "./babel-plugin-inject/index.mjs",
+      "import": "./babel-plugin-inject/index.mjs",
+      "require": "./babel-plugin-inject/index.js"
+    },
+    "./babel-plugin-inject/index": {
+      "browser": "./babel-plugin-inject/index.mjs",
+      "import": "./babel-plugin-inject/index.mjs",
+      "require": "./babel-plugin-inject/index.js"
+    },
+    "./babel-plugin-replace-expressions": {
+      "browser": "./babel-plugin-replace-expressions/index.mjs",
+      "import": "./babel-plugin-replace-expressions/index.mjs",
+      "require": "./babel-plugin-replace-expressions/index.js"
+    },
+    "./babel-plugin-replace-expressions/index": {
+      "browser": "./babel-plugin-replace-expressions/index.mjs",
+      "import": "./babel-plugin-replace-expressions/index.mjs",
+      "require": "./babel-plugin-replace-expressions/index.js"
+    },
+    "./babel-plugin-replace-import-extensions": {
+      "browser": "./babel-plugin-replace-import-extensions/index.mjs",
+      "import": "./babel-plugin-replace-import-extensions/index.mjs",
+      "require": "./babel-plugin-replace-import-extensions/index.js"
+    },
+    "./babel-plugin-replace-import-extensions/index": {
+      "browser": "./babel-plugin-replace-import-extensions/index.mjs",
+      "import": "./babel-plugin-replace-import-extensions/index.mjs",
+      "require": "./babel-plugin-replace-import-extensions/index.js"
+    },
+    "./babel-preset-framework": {
+      "browser": "./babel-preset-framework/index.mjs",
+      "import": "./babel-preset-framework/index.mjs",
+      "require": "./babel-preset-framework/index.js"
+    },
+    "./babel-preset-framework/index": {
+      "browser": "./babel-preset-framework/index.mjs",
+      "import": "./babel-preset-framework/index.mjs",
+      "require": "./babel-preset-framework/index.js"
+    },
+    "./browserslists": {
+      "browser": "./browserslists/index.mjs",
+      "import": "./browserslists/index.mjs",
+      "require": "./browserslists/index.js"
+    },
+    "./browserslists/index": {
+      "browser": "./browserslists/index.mjs",
+      "import": "./browserslists/index.mjs",
+      "require": "./browserslists/index.js"
+    },
+    "./build": {
+      "browser": "./build/index.mjs",
+      "import": "./build/index.mjs",
+      "require": "./build/index.js"
+    },
+    "./build/index": {
+      "browser": "./build/index.mjs",
+      "import": "./build/index.mjs",
+      "require": "./build/index.js"
+    },
+    "./cache": {
+      "browser": "./cache/index.mjs",
+      "import": "./cache/index.mjs",
+      "require": "./cache/index.js"
+    },
+    "./cache/index": {
+      "browser": "./cache/index.mjs",
+      "import": "./cache/index.mjs",
+      "require": "./cache/index.js"
+    },
+    "./changestate": {
+      "browser": "./changestate/index.browser.mjs",
+      "import": "./changestate/index.mjs",
+      "require": "./changestate/index.js"
+    },
+    "./changestate/index": {
+      "browser": "./changestate/index.browser.mjs",
+      "import": "./changestate/index.mjs",
+      "require": "./changestate/index.js"
+    },
+    "./components/Body": {
+      "browser": "./components/Body.browser.mjs",
+      "import": "./components/Body.mjs",
+      "require": "./components/Body.js"
+    },
+    "./components/Head": {
+      "browser": "./components/Head.browser.mjs",
+      "import": "./components/Head.mjs",
+      "require": "./components/Head.js"
+    },
+    "./components/Html": {
+      "browser": "./components/Html.browser.mjs",
+      "import": "./components/Html.mjs",
+      "require": "./components/Html.js"
+    },
+    "./components/Meta": {
+      "browser": "./components/Meta.browser.mjs",
+      "import": "./components/Meta.mjs",
+      "require": "./components/Meta.js"
+    },
+    "./components/Script": {
+      "browser": "./components/Script.browser.mjs",
+      "import": "./components/Script.mjs",
+      "require": "./components/Script.js"
+    },
+    "./components/Style": {
+      "browser": "./components/Style.browser.mjs",
+      "import": "./components/Style.mjs",
+      "require": "./components/Style.js"
+    },
+    "./components/Title": {
+      "browser": "./components/Title.browser.mjs",
+      "import": "./components/Title.mjs",
+      "require": "./components/Title.js"
+    },
+    "./config": {
+      "browser": "./config/index.mjs",
+      "import": "./config/index.mjs",
+      "require": "./config/index.js"
+    },
+    "./config/index": {
+      "browser": "./config/index.mjs",
+      "import": "./config/index.mjs",
+      "require": "./config/index.js"
+    },
+    "./constants": {
+      "browser": "./constants/index.mjs",
+      "import": "./constants/index.mjs",
+      "require": "./constants/index.js"
+    },
+    "./constants/index": {
+      "browser": "./constants/index.mjs",
+      "import": "./constants/index.mjs",
+      "require": "./constants/index.js"
+    },
+    "./context": {
+      "browser": "./context/index.mjs",
+      "import": "./context/index.mjs",
+      "require": "./context/index.js"
+    },
+    "./context/index": {
+      "browser": "./context/index.mjs",
+      "import": "./context/index.mjs",
+      "require": "./context/index.js"
+    },
+    "./core": {
+      "browser": "./core/index.mjs",
+      "import": "./core/index.mjs",
+      "require": "./core/index.js"
+    },
+    "./core/index": {
+      "browser": "./core/index.mjs",
+      "import": "./core/index.mjs",
+      "require": "./core/index.js"
+    },
+    "./css": {
+      "browser": "./css/index.browser.mjs",
+      "import": "./css/index.mjs",
+      "require": "./css/index.js"
+    },
+    "./css/index": {
+      "browser": "./css/index.browser.mjs",
+      "import": "./css/index.mjs",
+      "require": "./css/index.js"
+    },
+    "./dev-build/addSourceMappingURL": {
+      "browser": "./dev-build/addSourceMappingURL.mjs",
+      "import": "./dev-build/addSourceMappingURL.mjs",
+      "require": "./dev-build/addSourceMappingURL.js"
+    },
+    "./dev-build/babelTransformFile": {
+      "browser": "./dev-build/babelTransformFile.mjs",
+      "import": "./dev-build/babelTransformFile.mjs",
+      "require": "./dev-build/babelTransformFile.js"
+    },
+    "./dev-build/config": {
+      "browser": "./dev-build/config.mjs",
+      "import": "./dev-build/config.mjs",
+      "require": "./dev-build/config.js"
+    },
+    "./dev-build": {
+      "browser": "./dev-build/index.mjs",
+      "import": "./dev-build/index.mjs",
+      "require": "./dev-build/index.js"
+    },
+    "./dev-build/index": {
+      "browser": "./dev-build/index.mjs",
+      "import": "./dev-build/index.mjs",
+      "require": "./dev-build/index.js"
+    },
+    "./dev-build/patchTypescript": {
+      "browser": "./dev-build/patchTypescript.mjs",
+      "import": "./dev-build/patchTypescript.mjs",
+      "require": "./dev-build/patchTypescript.js"
+    },
+    "./dev-build/queue": {
+      "browser": "./dev-build/queue.mjs",
+      "import": "./dev-build/queue.mjs",
+      "require": "./dev-build/queue.js"
+    },
+    "./dev-build/resolveTransformer": {
+      "browser": "./dev-build/resolveTransformer.mjs",
+      "import": "./dev-build/resolveTransformer.mjs",
+      "require": "./dev-build/resolveTransformer.js"
+    },
+    "./dev-build/typescript": {
+      "browser": "./dev-build/typescript.mjs",
+      "import": "./dev-build/typescript.mjs",
+      "require": "./dev-build/typescript.js"
+    },
+    "./dev-build/writeFile": {
+      "browser": "./dev-build/writeFile.mjs",
+      "import": "./dev-build/writeFile.mjs",
+      "require": "./dev-build/writeFile.js"
+    },
+    "./dev-clean": {
+      "browser": "./dev-clean/index.mjs",
+      "import": "./dev-clean/index.mjs",
+      "require": "./dev-clean/index.js"
+    },
+    "./dev-clean/index": {
+      "browser": "./dev-clean/index.mjs",
+      "import": "./dev-clean/index.mjs",
+      "require": "./dev-clean/index.js"
+    },
+    "./dev-exports": {
+      "browser": "./dev-exports/index.mjs",
+      "import": "./dev-exports/index.mjs",
+      "require": "./dev-exports/index.js"
+    },
+    "./dev-exports/index": {
+      "browser": "./dev-exports/index.mjs",
+      "import": "./dev-exports/index.mjs",
+      "require": "./dev-exports/index.js"
+    },
+    "./fetch": {
+      "browser": "./fetch/index.browser.mjs",
+      "import": "./fetch/index.mjs",
+      "require": "./fetch/index.js"
+    },
+    "./fetch/index": {
+      "browser": "./fetch/index.browser.mjs",
+      "import": "./fetch/index.mjs",
+      "require": "./fetch/index.js"
+    },
+    "./graphql-client/body": {
+      "browser": "./graphql-client/body.mjs",
+      "import": "./graphql-client/body.mjs",
+      "require": "./graphql-client/body.js"
+    },
+    "./graphql-client/fetch": {
+      "browser": "./graphql-client/fetch.mjs",
+      "import": "./graphql-client/fetch.mjs",
+      "require": "./graphql-client/fetch.js"
+    },
+    "./graphql-client/get": {
+      "browser": "./graphql-client/get.mjs",
+      "import": "./graphql-client/get.mjs",
+      "require": "./graphql-client/get.js"
+    },
+    "./graphql-client/post": {
+      "browser": "./graphql-client/post.mjs",
+      "import": "./graphql-client/post.mjs",
+      "require": "./graphql-client/post.js"
+    },
+    "./graphql-client/querystring": {
+      "browser": "./graphql-client/querystring.mjs",
+      "import": "./graphql-client/querystring.mjs",
+      "require": "./graphql-client/querystring.js"
+    },
+    "./graphql-client/useMutation": {
+      "browser": "./graphql-client/useMutation.browser.mjs",
+      "import": "./graphql-client/useMutation.mjs",
+      "require": "./graphql-client/useMutation.js"
+    },
+    "./graphql-client/useQuery": {
+      "browser": "./graphql-client/useQuery.browser.mjs",
+      "import": "./graphql-client/useQuery.mjs",
+      "require": "./graphql-client/useQuery.js"
+    },
+    "./hooks/useForceUpdate": {
+      "browser": "./hooks/useForceUpdate.mjs",
+      "import": "./hooks/useForceUpdate.mjs",
+      "require": "./hooks/useForceUpdate.js"
+    },
+    "./http-server": {
+      "browser": "./http-server/index.mjs",
+      "import": "./http-server/index.mjs",
+      "require": "./http-server/index.js"
+    },
+    "./http-server/index": {
+      "browser": "./http-server/index.mjs",
+      "import": "./http-server/index.mjs",
+      "require": "./http-server/index.js"
+    },
+    "./hydrate": {
+      "browser": "./hydrate/index.mjs",
+      "import": "./hydrate/index.mjs",
+      "require": "./hydrate/index.js"
+    },
+    "./hydrate/index": {
+      "browser": "./hydrate/index.mjs",
+      "import": "./hydrate/index.mjs",
+      "require": "./hydrate/index.js"
+    },
+    "./jest-snapshot-serializer-babel": {
+      "browser": "./jest-snapshot-serializer-babel/index.mjs",
+      "import": "./jest-snapshot-serializer-babel/index.mjs",
+      "require": "./jest-snapshot-serializer-babel/index.js"
+    },
+    "./jest-snapshot-serializer-babel/index": {
+      "browser": "./jest-snapshot-serializer-babel/index.mjs",
+      "import": "./jest-snapshot-serializer-babel/index.mjs",
+      "require": "./jest-snapshot-serializer-babel/index.js"
+    },
+    "./jest-snapshot-serializer-graphql": {
+      "browser": "./jest-snapshot-serializer-graphql/index.mjs",
+      "import": "./jest-snapshot-serializer-graphql/index.mjs",
+      "require": "./jest-snapshot-serializer-graphql/index.js"
+    },
+    "./jest-snapshot-serializer-graphql/index": {
+      "browser": "./jest-snapshot-serializer-graphql/index.mjs",
+      "import": "./jest-snapshot-serializer-graphql/index.mjs",
+      "require": "./jest-snapshot-serializer-graphql/index.js"
+    },
+    "./jest-snapshot-serializer-preact": {
+      "browser": "./jest-snapshot-serializer-preact/index.mjs",
+      "import": "./jest-snapshot-serializer-preact/index.mjs",
+      "require": "./jest-snapshot-serializer-preact/index.js"
+    },
+    "./jest-snapshot-serializer-preact/index": {
+      "browser": "./jest-snapshot-serializer-preact/index.mjs",
+      "import": "./jest-snapshot-serializer-preact/index.mjs",
+      "require": "./jest-snapshot-serializer-preact/index.js"
+    },
+    "./jsx-runtime": {
+      "browser": "./jsx-runtime/index.browser.mjs",
+      "import": "./jsx-runtime/index.mjs",
+      "require": "./jsx-runtime/index.js"
+    },
+    "./jsx-runtime/index": {
+      "browser": "./jsx-runtime/index.browser.mjs",
+      "import": "./jsx-runtime/index.mjs",
+      "require": "./jsx-runtime/index.js"
+    },
+    "./lazy": {
+      "browser": "./lazy/index.browser.mjs",
+      "import": "./lazy/index.mjs",
+      "require": "./lazy/index.js"
+    },
+    "./lazy/index": {
+      "browser": "./lazy/index.browser.mjs",
+      "import": "./lazy/index.mjs",
+      "require": "./lazy/index.js"
+    },
+    "./preact-lock": {
+      "browser": "./preact-lock/index.mjs",
+      "import": "./preact-lock/index.mjs",
+      "require": "./preact-lock/index.js"
+    },
+    "./preact-lock/index": {
+      "browser": "./preact-lock/index.mjs",
+      "import": "./preact-lock/index.mjs",
+      "require": "./preact-lock/index.js"
+    },
+    "./prettier-module": {
+      "browser": "./prettier-module/index.mjs",
+      "import": "./prettier-module/index.mjs",
+      "require": "./prettier-module/index.js"
+    },
+    "./prettier-module/index": {
+      "browser": "./prettier-module/index.mjs",
+      "import": "./prettier-module/index.mjs",
+      "require": "./prettier-module/index.js"
+    },
+    "./render-to-string": {
+      "browser": "./render-to-string/index.mjs",
+      "import": "./render-to-string/index.mjs",
+      "require": "./render-to-string/index.js"
+    },
+    "./render-to-string/index": {
+      "browser": "./render-to-string/index.mjs",
+      "import": "./render-to-string/index.mjs",
+      "require": "./render-to-string/index.js"
+    },
+    "./route-generator": {
+      "browser": "./route-generator/index.mjs",
+      "import": "./route-generator/index.mjs",
+      "require": "./route-generator/index.js"
+    },
+    "./route-generator/index": {
+      "browser": "./route-generator/index.mjs",
+      "import": "./route-generator/index.mjs",
+      "require": "./route-generator/index.js"
+    },
+    "./store": {
+      "browser": "./store/index.browser.mjs",
+      "import": "./store/index.mjs",
+      "require": "./store/index.js"
+    },
+    "./store/index": {
+      "browser": "./store/index.browser.mjs",
+      "import": "./store/index.mjs",
+      "require": "./store/index.js"
+    },
+    "./types/global": {
+      "browser": "./types/global.mjs",
+      "import": "./types/global.mjs",
+      "require": "./types/global.js"
+    },
+    "./types/graphql": {
+      "browser": "./types/graphql.mjs",
+      "import": "./types/graphql.mjs",
+      "require": "./types/graphql.js"
+    },
+    "./types": {
+      "browser": "./types/index.mjs",
+      "import": "./types/index.mjs",
+      "require": "./types/index.js"
+    },
+    "./types/index": {
+      "browser": "./types/index.mjs",
+      "import": "./types/index.mjs",
+      "require": "./types/index.js"
+    },
+    "./types/jsx": {
+      "browser": "./types/jsx.mjs",
+      "import": "./types/jsx.mjs",
+      "require": "./types/jsx.js"
+    },
+    "./types/module": {
+      "browser": "./types/module.mjs",
+      "import": "./types/module.mjs",
+      "require": "./types/module.js"
+    },
+    "./types/preact": {
+      "browser": "./types/preact.mjs",
+      "import": "./types/preact.mjs",
+      "require": "./types/preact.js"
+    },
+    "./utils/createClassName": {
+      "browser": "./utils/createClassName.mjs",
+      "import": "./utils/createClassName.mjs",
+      "require": "./utils/createClassName.js"
+    },
+    "./utils/createObject": {
+      "browser": "./utils/createObject.mjs",
+      "import": "./utils/createObject.mjs",
+      "require": "./utils/createObject.js"
+    },
+    "./utils/createObjectNull": {
+      "browser": "./utils/createObjectNull.mjs",
+      "import": "./utils/createObjectNull.mjs",
+      "require": "./utils/createObjectNull.js"
+    },
+    "./utils/getElementById": {
+      "browser": "./utils/getElementById.mjs",
+      "import": "./utils/getElementById.mjs",
+      "require": "./utils/getElementById.js"
+    },
+    "./utils/memoizeMap": {
+      "browser": "./utils/memoizeMap.mjs",
+      "import": "./utils/memoizeMap.mjs",
+      "require": "./utils/memoizeMap.js"
+    },
+    "./utils/memoizeObject": {
+      "browser": "./utils/memoizeObject.mjs",
+      "import": "./utils/memoizeObject.mjs",
+      "require": "./utils/memoizeObject.js"
+    },
+    "./utils/memoizeWeakMap": {
+      "browser": "./utils/memoizeWeakMap.mjs",
+      "import": "./utils/memoizeWeakMap.mjs",
+      "require": "./utils/memoizeWeakMap.js"
+    },
+    "./utils/objectMap": {
+      "browser": "./utils/objectMap.mjs",
+      "import": "./utils/objectMap.mjs",
+      "require": "./utils/objectMap.js"
+    },
+    "./utils/once": {
+      "browser": "./utils/once.mjs",
+      "import": "./utils/once.mjs",
+      "require": "./utils/once.js"
+    },
+    "./variables": {
+      "browser": "./variables/index.mjs",
+      "import": "./variables/index.mjs",
+      "require": "./variables/index.js"
+    },
+    "./variables/index": {
+      "browser": "./variables/index.mjs",
+      "import": "./variables/index.mjs",
+      "require": "./variables/index.js"
+    }
   }
 }
