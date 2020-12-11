@@ -82,9 +82,9 @@ export class Server extends HttpServer {
   start = async (port = parseInt(process.env.PORT as any, 10) || 8080) => {
     const middleware = await Promise.all(this.middlewareFactories.map((middlewareFactory) => middlewareFactory(this)));
     this.middleware = middleware.filter((middleware): middleware is Middleware => !!middleware);
-    await promisify(this.listen).call(this, port);
+    await promisify(this.listen.bind(this, port))();
   };
   end = async () => {
-    return promisify(this.close).call(this);
+    return promisify(this.close.bind(this))();
   };
 }

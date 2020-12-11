@@ -1,6 +1,6 @@
 {
   "name": "@mo36924/framework",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Web framework for Node.js",
   "keywords": [],
   "author": "mo36924 <mo36924@users.noreply.github.com>",
@@ -20,6 +20,7 @@
   "module": "core/index.mjs",
   "browser": "core/index.mjs",
   "scripts": {
+    "postinstall": "patch-package",
     "clean-build": "run-s clean build exports",
     "build": "babel-node -x \".ts\" src/dev-build",
     "watch": "babel-node -x \".ts\" src/dev-build --watch",
@@ -71,7 +72,7 @@
         "displayName": "server",
         "testEnvironment": "node",
         "moduleNameMapper": {
-          "^#/(.*)$": "<rootDir>/src/$1"
+          "^#(.*)$": "<rootDir>/src/$1"
         },
         "testMatch": [
           "**/__tests__/**/*.[jt]s?(x)",
@@ -98,7 +99,7 @@
         "displayName": "browser",
         "testEnvironment": "jsdom",
         "moduleNameMapper": {
-          "^#/(.*)$": "<rootDir>/src/$1"
+          "^#(.*)$": "<rootDir>/src/$1"
         },
         "testMatch": [
           "**/?(*.)browser.+(spec|test).[jt]s?(x)"
@@ -120,14 +121,15 @@
     ]
   },
   "dependencies": {
-    "@babel/core": "7.12.3",
-    "@babel/node": "7.12.6",
-    "@babel/preset-env": "7.12.1",
-    "@babel/preset-react": "7.12.5",
-    "@babel/preset-typescript": "7.12.1",
-    "@rollup/plugin-babel": "5.2.1",
+    "@babel/core": "7.12.10",
+    "@babel/node": "7.12.10",
+    "@babel/preset-env": "7.12.10",
+    "@babel/preset-react": "7.12.10",
+    "@babel/preset-typescript": "7.12.7",
+    "@rollup/plugin-babel": "5.2.2",
     "@rollup/plugin-commonjs": "16.0.0",
     "@rollup/plugin-typescript": "6.1.0",
+    "@ts-morph/bootstrap": "0.8.0",
     "@types/babel__core": "7.1.12",
     "@types/babel__preset-env": "7.9.1",
     "@types/http-errors": "1.8.0",
@@ -139,16 +141,18 @@
     "cosmiconfig": "7.0.0",
     "cssnano-preset-advanced": "4.0.7",
     "del-cli": "3.0.1",
-    "enhanced-resolve": "5.3.1",
+    "enhanced-resolve": "5.3.2",
     "eslint": "7.13.0",
     "fast-glob": "3.2.4",
     "graphql": "15.4.0",
+    "graphql-language-service-interface": "2.5.0",
     "http-errors": "1.8.0",
     "jest": "26.6.3",
     "jsesc": "3.0.2",
     "node-fetch": "2.6.1",
     "npm-run-all": "4.1.5",
     "p-queue": "6.6.2",
+    "patch-package": "6.2.2",
     "postcss": "7.0.35",
     "postcss-nested": "4.2.3",
     "preact": "10.5.7",
@@ -157,7 +161,8 @@
     "rollup": "2.33.3",
     "rollup-plugin-terser": "7.0.2",
     "ts-jest": "26.4.4",
-    "typescript": "4.0.5"
+    "typescript": "4.1.2",
+    "vscode-languageserver-types": "3.15.1"
   },
   "devDependencies": {},
   "imports": {
@@ -630,6 +635,11 @@
       "browser": "./types/preact.mjs",
       "import": "./types/preact.mjs",
       "require": "./types/preact.js"
+    },
+    "#types/utils": {
+      "browser": "./types/utils.mjs",
+      "import": "./types/utils.mjs",
+      "require": "./types/utils.js"
     },
     "#utils/createClassName": {
       "browser": "./utils/createClassName.mjs",
@@ -1162,6 +1172,11 @@
       "browser": "./types/preact.mjs",
       "import": "./types/preact.mjs",
       "require": "./types/preact.js"
+    },
+    "./types/utils": {
+      "browser": "./types/utils.mjs",
+      "import": "./types/utils.mjs",
+      "require": "./types/utils.js"
     },
     "./utils/createClassName": {
       "browser": "./utils/createClassName.mjs",

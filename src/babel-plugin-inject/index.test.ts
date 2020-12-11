@@ -34,4 +34,16 @@ describe("babel-plugin-inject", () => {
       console.log(_Headers);
     `);
   });
+  test("import module", async () => {
+    const result = await transform(`
+      import { fetch } from "node-fetch"
+    `);
+    expect(result).toMatchInlineSnapshot(`import { fetch } from "node-fetch";`);
+  });
+  test("export module", async () => {
+    const result = await transform(`
+      export { fetch } from "node-fetch"
+    `);
+    expect(result).toMatchInlineSnapshot(`export { fetch } from "node-fetch";`);
+  });
 });

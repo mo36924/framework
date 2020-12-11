@@ -1,30 +1,49 @@
+import { packageName } from "#constants";
+import type { DeepPartial } from "#types";
 import { cosmiconfig, cosmiconfigSync } from "cosmiconfig";
 import type { CosmiconfigResult } from "cosmiconfig/dist/types";
 import { basename } from "path";
-import { packageName } from "#constants";
-import type * as variables from "#variables";
-import { defaultOptions as defaultRouteGeneratorConfig, Options as RouteGeneratorConfig } from "#route-generator";
 
-export type Config = {
-  "route-generator": Required<RouteGeneratorConfig>;
-  variables: Partial<typeof variables>;
-  filepath: string;
+const defaultConfig = {
+  filepath: "package.json",
+  node: {
+    entry: "node/index.ts",
+    outDir: "dist/node",
+  },
+  browser: {
+    entry: "browser/index.ts",
+    outDir: "dist/browser",
+  },
+  variables: {},
+  "route-generator": {
+    watch: !!process.env.NODE_ENV,
+    routeDir: "routes",
+    component: "components/Router.tsx",
+    template: "components/Router.txt",
+    include: ["**/*.tsx"],
+    exclude: ["**/*.(test|spec).tsx", "**/__tests__/**"],
+  },
 };
+
+export type Config = typeof defaultConfig;
+export type PartialConfig = DeepPartial<Config>;
 
 const moduleName = basename(packageName);
 
-function merge<T, U>(target: T, source: U): T & U {
-  const obj = Object.assign(Object.create(null), target);
-  for (const [key, value] of Object.entries(source ?? {})) {
-    obj[key] ??= value;
+export function mergeConfig<T>(target: T, source: any = {}): T {
+  const ret: any = {};
+  for (const [key, value] of Object.entries(target)) {
+    if (typeof value === "object") {
+      ret[key] = { ...value, ...source[key] };
+    } else {
+      ret[key] = source[key] ?? value;
+    }
   }
-  return obj;
+  return ret;
 }
 
 function config(cosmiconfigResult: CosmiconfigResult) {
-  const config: Config = { ...cosmiconfigResult?.config };
-  config["route-generator"] = merge(defaultRouteGeneratorConfig, config["route-generator"]);
-  config.variables ??= {};
+  const config: Config = mergeConfig(defaultConfig, cosmiconfigResult?.config);
   config.filepath = cosmiconfigResult?.filepath ?? "";
   return config;
 }

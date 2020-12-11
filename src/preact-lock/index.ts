@@ -1,5 +1,5 @@
 export type { default as preact } from "preact";
-export {
+export type {
   AnyComponent,
   Attributes,
   ClassAttributes,
@@ -13,7 +13,6 @@ export {
   ComponentType,
   Consumer,
   Context,
-  Fragment,
   FunctionComponent,
   FunctionalComponent,
   JSX,
@@ -29,6 +28,8 @@ export {
   RefObject,
   RenderableProps,
   VNode,
+} from "preact";
+export {
   cloneElement,
   createContext,
   createElement,
@@ -39,6 +40,7 @@ export {
   options,
   render,
   toChildArray,
+  Fragment,
 } from "preact";
 export * from "preact/hooks";
-export * from "#jsx-runtime";
+export * from "preact/jsx-runtime";

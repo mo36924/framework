@@ -100,7 +100,10 @@ export default (_api: Api, options: Options): TransformOptions => {
       [
         enhancedResolve,
         {
-          ignoreBareImport: __NODE__,
+          ignoreBuiltins: __NODE__,
+          mainFields: __NODE__ ? ["module", "main"] : ["browser", "module", "main"],
+          conditionNames: __NODE__ ? ["import"] : ["browser", "import"],
+          extensions: [".tsx", ".ts", ".jsx", ".mjs", ".js", ".json"],
         } as enhancedResolveOptions,
       ],
       [

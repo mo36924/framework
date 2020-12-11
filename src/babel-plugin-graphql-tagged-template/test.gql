@@ -1,0 +1,11 @@
+type Query {
+  user(id: Int!, offset: Int): User
+}
+type Mutation {
+  createUser(id: Int!, name: String): User
+}
+type User {
+  id: Int!
+  version: Int!
+  name: String
+}

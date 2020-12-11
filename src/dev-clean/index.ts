@@ -2,17 +2,17 @@ import { readdir, rmdir, unlink } from "fs/promises";
 import { exit } from "process";
 
 (async () => {
-  const sourceDir = "src";
   const [dirs] = await Promise.all([
-    readdir(sourceDir, { withFileTypes: true }),
+    readdir(".", { withFileTypes: true }),
     unlink("tsconfig.tsbuildinfo").catch(() => {}),
   ]);
   await Promise.allSettled(
     dirs.map(async (dir) => {
-      if (!dir.isDirectory()) {
+      const name = dir.name;
+      if (!dir.isDirectory() || name[0] === "." || name === "patches" || name === "node_modules" || name === "src") {
         return;
       }
-      await rmdir(dir.name, { recursive: true });
+      await rmdir(name, { recursive: true });
     })
   );
 })().catch((err) => {

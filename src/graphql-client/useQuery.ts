@@ -1,8 +1,8 @@
+import { context } from "#context";
 import { useContext } from "#preact-lock";
 import type { UseQuery } from "#types";
-import { querystring } from "./querystring";
-import { context } from "#context";
 import { get } from "./get";
+import { querystring } from "./querystring";
 
 export const useQuery: UseQuery = (args: any) => {
   const qs = querystring(args);

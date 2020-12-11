@@ -4,24 +4,9 @@ import { dirname, extname, relative, resolve, sep } from "path";
 import { watch } from "chokidar";
 import { format as prettierFormat, resolveConfig } from "#prettier-module";
 import { packageName } from "#constants";
+import { PartialConfig, getConfig } from "#config";
 
-export type Options = {
-  watch?: boolean;
-  routeDir?: string;
-  component?: string;
-  template?: string;
-  include?: string | string[];
-  exclude?: string | string[];
-};
-
-export const defaultOptions: Required<Options> = {
-  watch: false,
-  routeDir: "routes",
-  component: "components/Router.tsx",
-  template: "components/Router.txt",
-  include: ["**/*.tsx"],
-  exclude: ["**/*.(test|spec).tsx", "**/__tests__/**"],
-};
+export type Options = PartialConfig["route-generator"];
 
 const defaultTemplate = `
 import { createContext, Component, ComponentType } from "${packageName}";
@@ -98,7 +83,11 @@ export default class Router extends Component<{ href: string }, RouteContextValu
 `;
 
 export async function routeGenerator(options?: Options) {
-  const { watch: watchMode, routeDir, component, template, include, exclude } = { ...defaultOptions, ...options };
+  const config = await getConfig();
+  const { watch: watchMode, routeDir, component, template, include, exclude } = {
+    ...config["route-generator"],
+    ...options,
+  };
 
   await Promise.all([
     mkdir(routeDir, { recursive: true }),

@@ -14,7 +14,7 @@ describe("babel-preset", () => {
   test("preset", async () => {
     const code = await transform("css`width: 10px`");
     expect(code).toMatchInlineSnapshot(`
-      import { css as _css } from "@mo36924/framework";
+      import { css as _css } from "./core/index.mjs";
 
       const _css2 = _css(
         typeof self === "undefined"
