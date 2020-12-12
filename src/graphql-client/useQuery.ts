@@ -1,6 +1,6 @@
-import { context } from "#context";
-import { useContext } from "#preact-lock";
-import type { UseQuery } from "#types";
+import { context } from "~/context";
+import { useContext } from "~/preact-lock";
+import type { UseQuery } from "~/types";
 import { get } from "./get";
 import { querystring } from "./querystring";
 

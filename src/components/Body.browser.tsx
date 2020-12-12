@@ -1,4 +1,4 @@
-import { Fragment } from "#preact-lock";
+import { Fragment } from "~/preact-lock";
 import type { BodyProps } from "./Body";
 export type { BodyProps } from "./Body";
 

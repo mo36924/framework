@@ -2,9 +2,9 @@ import { once } from "events";
 import { mkdir, readFile, writeFile } from "fs/promises";
 import { dirname, extname, relative, resolve, sep } from "path";
 import { watch } from "chokidar";
-import { format as prettierFormat, resolveConfig } from "#prettier-module";
-import { packageName } from "#constants";
-import { PartialConfig, getConfig } from "#config";
+import { format as prettierFormat, resolveConfig } from "~/prettier-module";
+import { packageName } from "~/constants";
+import { PartialConfig, getConfig } from "~/config";
 
 export type Options = PartialConfig["route-generator"];
 

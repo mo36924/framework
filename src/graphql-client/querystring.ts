@@ -1,4 +1,4 @@
-import type { GraphQLArgs } from "#types";
+import type { GraphQLArgs } from "~/types";
 
 export const querystring = ({ query, variables }: GraphQLArgs) => {
   const params = new URLSearchParams({ query: query });

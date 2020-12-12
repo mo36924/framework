@@ -1,5 +1,5 @@
-import { packageName } from "#constants";
-import type { DeepPartial } from "#types";
+import { packageName } from "~/constants";
+import type { DeepPartial } from "~/types";
 import { cosmiconfig, cosmiconfigSync } from "cosmiconfig";
 import type { CosmiconfigResult } from "cosmiconfig/dist/types";
 import { basename } from "path";

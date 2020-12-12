@@ -1,4 +1,4 @@
-import { isValidElement, VNode } from "#preact-lock";
+import { isValidElement, VNode } from "~/preact-lock";
 import { render } from "preact-render-to-string/dist/jsx";
 
 export function test(value: any) {

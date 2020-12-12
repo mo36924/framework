@@ -1,7 +1,7 @@
-import type { CssFactory } from "#babel-plugin-css-tagged-template";
-import { classes } from "#store";
-import { getElementById } from "#utils/getElementById";
-import { styleId } from "#variables";
+import type { CssFactory } from "~/babel-plugin-css-tagged-template";
+import { classes } from "~/store";
+import { getElementById } from "~/utils/getElementById";
+import { styleId } from "~/variables";
 import type { CssTaggedTemplate, CssTaggedTemplateValues } from "./index";
 export type { CssTaggedTemplate, CssTaggedTemplateValues } from "./index";
 

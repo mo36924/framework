@@ -1,4 +1,4 @@
-import "#types";
+import "~/types";
 
 if (typeof window !== "undefined" && window.onchangestate === undefined) {
   window.onchangestate = null;

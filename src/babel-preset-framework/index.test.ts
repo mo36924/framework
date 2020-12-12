@@ -14,7 +14,7 @@ describe("babel-preset", () => {
   test("preset", async () => {
     const code = await transform("css`width: 10px`");
     expect(code).toMatchInlineSnapshot(`
-      import { css as _css } from "./core/index.mjs";
+      import { css as _css } from "@mo36924/framework";
 
       const _css2 = _css(
         typeof self === "undefined"
@@ -33,5 +33,10 @@ describe("babel-preset", () => {
 
       _css2();
     `);
+  });
+
+  test("preset-resolve", async () => {
+    const code = await transform(`import "preact"`);
+    expect(code).toMatchInlineSnapshot(`import "./node_modules/preact/dist/preact.mjs";`);
   });
 });

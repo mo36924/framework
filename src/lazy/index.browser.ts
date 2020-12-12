@@ -1,5 +1,5 @@
-import { useForceUpdate } from "#hooks/useForceUpdate";
-import { ComponentType, jsx } from "#preact-lock";
+import { useForceUpdate } from "~/hooks/useForceUpdate";
+import { ComponentType, jsx } from "~/preact-lock";
 
 export const lazy = <T>(
   loader: () => Promise<{ default: ComponentType<T> }>

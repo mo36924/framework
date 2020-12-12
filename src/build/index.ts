@@ -1,9 +1,9 @@
-import framework, { Options as FrameworkOptions } from "#babel-preset-framework";
-import { getConfig, mergeConfig, PartialConfig } from "#config";
+import framework, { Options as FrameworkOptions } from "~/babel-preset-framework";
+import { getConfig, mergeConfig, PartialConfig } from "~/config";
 import { babel } from "@rollup/plugin-babel";
 import commonjs from "@rollup/plugin-commonjs";
 import typescript from "@rollup/plugin-typescript";
-import * as browserslists from "#browserslists";
+import * as browserslists from "~/browserslists";
 import { builtinModules } from "module";
 import { rollup } from "rollup";
 import { terser } from "rollup-plugin-terser";

@@ -1,8 +1,8 @@
 import jsesc from "jsesc";
-import type { ComponentChildren } from "#preact-lock";
-import { rootId, storeId } from "#variables";
-import { Consumer } from "#context";
-import type { Store } from "#store";
+import type { ComponentChildren } from "~/preact-lock";
+import { rootId, storeId } from "~/variables";
+import { Consumer } from "~/context";
+import type { Store } from "~/store";
 
 export type BodyProps = {
   children?: ComponentChildren;

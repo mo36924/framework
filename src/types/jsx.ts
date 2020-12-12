@@ -1,4 +1,4 @@
-import type { JSX } from "#preact-lock";
+import type { JSX } from "~/preact-lock";
 
 type _IntrinsicElements = JSX.IntrinsicElements;
 type __IntrinsicElements = {

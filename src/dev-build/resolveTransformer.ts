@@ -18,7 +18,7 @@ function resolveModuleSpecifier(sf: SourceFile, path: string) {
   if (/^[A-Za-z@]/.test(path)) {
     return;
   }
-  if (!sf.isDeclarationFile && path[0] === "#") {
+  if (!sf.isDeclarationFile && path[0] === "~/") {
     return;
   }
 

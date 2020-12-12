@@ -1,6 +1,6 @@
 // import { jsx, Fragment } from "./index.browser";
-// import { Consumer } from "#context";
-// import { styles } from "#cache";
+// import { Consumer } from "~/context";
+// import { styles } from "~/cache";
 
 // const createVNode: typeof jsx = (type: any, props: any, key: any) => {
 //   if (!props) {

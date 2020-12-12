@@ -1,5 +1,5 @@
-import { useCallback, useState } from "#preact-lock";
-import type { UseMutation } from "#types";
+import { useCallback, useState } from "~/preact-lock";
+import type { UseMutation } from "~/types";
 import { body } from "./body";
 import { post } from "./post";
 

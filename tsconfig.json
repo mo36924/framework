@@ -14,9 +14,9 @@
     "importsNotUsedAsValues": "error",
     "outDir": ".",
     "jsx": "preserve",
-    "baseUrl": "src",
+    "baseUrl": "./src",
     "paths": {
-      "#*": ["*"]
+      "~/*": ["./*"]
     }
   },
   "include": ["src"],

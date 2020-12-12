@@ -1,4 +1,4 @@
-import { ComponentType, jsx } from "#preact-lock";
+import { ComponentType, jsx } from "~/preact-lock";
 
 export const lazy = <T>(
   loader: () => Promise<{ default: ComponentType<T> }>

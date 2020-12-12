@@ -1,4 +1,4 @@
-import { createObjectNull } from "#utils/createObjectNull";
+import { createObjectNull } from "~/utils/createObjectNull";
 
 export type Store = {
   classes: {

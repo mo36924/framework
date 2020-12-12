@@ -1,7 +1,7 @@
 import { readFileSync } from "fs";
 import type { default as babel, PluginObj } from "@babel/core";
 import { BREAK, buildSchema, DefinitionNode, parse, stripIgnoredCharacters, validate, visit } from "graphql";
-import { createPropName } from "#utils/createPropName";
+import { createPropName } from "~/utils/createPropName";
 
 export type Options = {
   schema: string;

@@ -1,4 +1,4 @@
-import type { ComponentChildren } from "#preact-lock";
+import type { ComponentChildren } from "~/preact-lock";
 
 export type HtmlProps = {
   lang?:

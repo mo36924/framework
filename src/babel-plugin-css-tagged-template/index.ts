@@ -1,12 +1,12 @@
-import "#types";
+import "~/types";
 import type { default as babel, PluginObj } from "@babel/core";
 import cssnanoPresetAdvanced from "cssnano-preset-advanced";
 import postcss, { Transformer, Plugin } from "postcss";
 import nested from "postcss-nested";
-import * as browserslists from "#browserslists";
+import * as browserslists from "~/browserslists";
 import { createHash } from "crypto";
-import { packageName } from "#constants";
-import { objectMap } from "#utils/objectMap";
+import { packageName } from "~/constants";
+import { objectMap } from "~/utils/objectMap";
 
 export type Options = {
   tags?: string[];

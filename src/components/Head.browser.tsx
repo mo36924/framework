@@ -1,4 +1,4 @@
-import { Fragment } from "#preact-lock";
+import { Fragment } from "~/preact-lock";
 import type { HeadProps } from "./Head";
 export type { HeadProps } from "./Head";
 export const Head: typeof Fragment = typeof __PROD__ === "boolean" ? Fragment : dev();

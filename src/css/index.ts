@@ -1,7 +1,7 @@
-import type { NodeCssFactory } from "#babel-plugin-css-tagged-template";
-import { createClassName } from "#utils/createClassName";
-import { classes } from "#store";
-import { styles } from "#cache";
+import type { NodeCssFactory } from "~/babel-plugin-css-tagged-template";
+import { createClassName } from "~/utils/createClassName";
+import { classes } from "~/store";
+import { styles } from "~/cache";
 
 export type CssTaggedTemplate = (strings: TemplateStringsArray, ...values: CssTaggedTemplateValues) => string;
 export type CssTaggedTemplateValues = (string | number)[];

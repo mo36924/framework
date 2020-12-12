@@ -1,6 +1,6 @@
-import { Context, createContext } from "#preact-lock";
-import type * as browserslists from "#browserslists";
-import { createObjectNull } from "#utils/createObjectNull";
+import { Context, createContext } from "~/preact-lock";
+import type * as browserslists from "~/browserslists";
+import { createObjectNull } from "~/utils/createObjectNull";
 
 export type ContextValue = {
   url: string;

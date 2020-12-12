@@ -1,8 +1,8 @@
 import jsesc from "jsesc";
-import { styleId } from "#variables";
-import { Consumer } from "#context";
-import { styles } from "#cache";
-import type { ComponentChildren } from "#preact-lock";
+import { styleId } from "~/variables";
+import { Consumer } from "~/context";
+import { styles } from "~/cache";
+import type { ComponentChildren } from "~/preact-lock";
 
 export type HeadProps = {
   children?: ComponentChildren;

@@ -1,19 +1,19 @@
-import "#types";
+import "~/types";
 import type { default as babel, TransformOptions, ConfigAPI } from "@babel/core";
 import presetEnv, { Options as presetEnvOptions } from "@babel/preset-env";
 import presetTypescript from "@babel/preset-typescript";
 import presetReact from "@babel/preset-react";
-import replaceExpressions from "#babel-plugin-replace-expressions";
-import cssTaggedTemplate from "#babel-plugin-css-tagged-template";
-import enhancedResolve, { Options as enhancedResolveOptions } from "#babel-plugin-enhanced-resolve";
-import inject from "#babel-plugin-inject";
+import replaceExpressions from "~/babel-plugin-replace-expressions";
+import cssTaggedTemplate from "~/babel-plugin-css-tagged-template";
+import enhancedResolve, { Options as enhancedResolveOptions } from "~/babel-plugin-enhanced-resolve";
+import inject from "~/babel-plugin-inject";
 import { constantCase } from "change-case";
-import * as variables from "#variables";
+import * as variables from "~/variables";
 import { resolve } from "path";
 
-import { packageName } from "#constants";
-import { modern, module, nomodule } from "#browserslists";
-import { getConfigSync } from "#config";
+import { packageName } from "~/constants";
+import { modern, module, nomodule } from "~/browserslists";
+import { getConfigSync } from "~/config";
 
 type Api = ConfigAPI & typeof babel;
 
@@ -101,6 +101,7 @@ export default (_api: Api, options: Options): TransformOptions => {
         enhancedResolve,
         {
           ignoreBuiltins: __NODE__,
+          aliasFields: __NODE__ ? [] : ["browser"],
           mainFields: __NODE__ ? ["module", "main"] : ["browser", "module", "main"],
           conditionNames: __NODE__ ? ["import"] : ["browser", "import"],
           extensions: [".tsx", ".ts", ".jsx", ".mjs", ".js", ".json"],

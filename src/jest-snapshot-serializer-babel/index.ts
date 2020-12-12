@@ -1,4 +1,4 @@
-import { resolveConfig, format } from "#prettier-module";
+import { resolveConfig, format } from "~/prettier-module";
 import type { BabelFileResult } from "@babel/core";
 
 const config = { ...resolveConfig.sync("index.js"), filepath: "index.js" };

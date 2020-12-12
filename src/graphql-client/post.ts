@@ -1,4 +1,4 @@
-import { graphqlEndpoint } from "#variables";
+import { graphqlEndpoint } from "~/variables";
 import { fetch } from "./fetch";
 
 export const post = (body: string) =>
