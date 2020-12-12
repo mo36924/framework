@@ -1,6 +1,6 @@
 {
   "name": "@mo36924/framework",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Web framework for Node.js",
   "keywords": [],
   "author": "mo36924 <mo36924@users.noreply.github.com>",
@@ -161,7 +161,7 @@
     "rollup": "2.33.3",
     "rollup-plugin-terser": "7.0.2",
     "ts-jest": "26.4.4",
-    "typescript": "4.1.2",
+    "typescript": "npm:@mo36924/typescript-patch@4.1.2",
     "vscode-languageserver-types": "3.15.1"
   },
   "devDependencies": {},
