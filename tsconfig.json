@@ -13,7 +13,8 @@
     "forceConsistentCasingInFileNames": true,
     "importsNotUsedAsValues": "error",
     "outDir": ".",
-    "jsx": "preserve",
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact",
     "baseUrl": "./src",
     "paths": {
       "~/*": ["./*"]

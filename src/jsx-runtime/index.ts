@@ -1,34 +1,33 @@
-// import { jsx, Fragment } from "./index.browser";
-// import { Consumer } from "~/context";
-// import { styles } from "~/cache";
+import "../types";
+import { jsx as _jsx, Fragment } from "preact/jsx-runtime";
+import { Consumer } from "~/context";
+import { styles } from "~/cache";
 
-// const createVNode: typeof jsx = (type: any, props: any, key: any) => {
-//   if (!props) {
-//     return jsx(type, props, key);
-//   }
-//   const className: undefined | string = props.className || props.class;
-//   if (!className) {
-//     return jsx(type, props, key);
-//   }
-//   const classNames = className
-//     .trim()
-//     .split(/ +/)
-//     .filter((className) => styles[className]);
+const jsx: typeof _jsx = (type: any, props: any, ...args: any[]) => {
+  if (!props) {
+    return _jsx(type, props, ...args);
+  }
+  const className: undefined | string = props.className || props.class;
+  if (!className) {
+    return _jsx(type, props, ...args);
+  }
+  const classNames = className
+    .trim()
+    .split(/ +/)
+    .filter((className) => styles[className]);
 
-//   if (!classNames.length) {
-//     return jsx(type, props, key);
-//   }
+  if (!classNames.length) {
+    return _jsx(type, props, ...args);
+  }
 
-//   return jsx(Consumer, {
-//     children: (value) => {
-//       classNames.forEach((className) => {
-//         value.classes[styles[className].cacheKey] = className;
-//       });
-//       return jsx(type, props, key);
-//     },
-//   });
-// };
+  return _jsx(Consumer, {
+    children: (value) => {
+      classNames.forEach((className) => {
+        value.classes[styles[className].cacheKey] = className;
+      });
+      return _jsx(type, props, ...args);
+    },
+  });
+};
 
-// export { createVNode as jsx, createVNode as jsxs, createVNode as jsxDEV, Fragment };
-
-export { jsx, jsxs, jsxDEV, Fragment } from "preact/jsx-runtime";
+export { jsx, jsx as jsxs, jsx as jsxDEV, Fragment };
