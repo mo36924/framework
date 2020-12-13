@@ -1,5 +1,5 @@
 import "../types";
-import { jsx as _jsx, Fragment } from "preact/jsx-runtime";
+import { jsx as _jsx, Fragment, JSX as JSXInternal } from "preact/jsx-runtime";
 import { Consumer } from "~/context";
 import { styles } from "~/cache";
 
@@ -30,4 +30,20 @@ const jsx: typeof _jsx = (type: any, props: any, ...args: any[]) => {
   });
 };
 
+type _IntrinsicElements = JSXInternal.IntrinsicElements;
+type __IntrinsicElements = {
+  [P in keyof _IntrinsicElements]: Omit<_IntrinsicElements[P], "class">;
+};
+declare namespace JSX {
+  interface Element extends JSXInternal.Element {}
+  interface ElementClass extends JSXInternal.ElementClass {}
+  interface ElementAttributesProperty extends JSXInternal.ElementAttributesProperty {}
+  interface ElementChildrenAttribute extends JSXInternal.ElementChildrenAttribute {}
+  type LibraryManagedAttributes<C, P> = JSXInternal.LibraryManagedAttributes<C, P>;
+  interface IntrinsicAttributes extends JSXInternal.IntrinsicAttributes {}
+  interface IntrinsicClassAttributes<T> extends preact.ClassAttributes<T> {}
+  interface IntrinsicElements extends __IntrinsicElements {}
+}
+
 export { jsx, jsx as jsxs, jsx as jsxDEV, Fragment };
+export type { JSX };
