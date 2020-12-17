@@ -1,5 +1,9 @@
 import type { ExecutionResult } from "graphql";
 
+type TemplateStringsArray = readonly string[] & {
+  readonly raw: readonly string[];
+};
+
 type GraphQLTemplateType = {
   _values?: any[];
   _variables?: any;
