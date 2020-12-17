@@ -1,6 +1,6 @@
 {
   "name": "@mo36924/framework",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Web framework for Node.js",
   "keywords": [],
   "author": "mo36924 <mo36924@users.noreply.github.com>",
@@ -150,6 +150,7 @@
     "@types/babel__preset-env": "7.9.1",
     "@types/http-errors": "1.8.0",
     "@types/jsesc": "2.5.1",
+    "@types/lru-cache": "5.1.0",
     "@types/node-fetch": "2.5.7",
     "babel-plugin-module-resolver": "4.0.0",
     "change-case": "4.1.1",
@@ -165,6 +166,7 @@
     "http-errors": "1.8.0",
     "jest": "26.6.3",
     "jsesc": "3.0.2",
+    "lru-cache": "6.0.0",
     "node-fetch": "2.6.1",
     "npm-run-all": "4.1.5",
     "p-queue": "6.6.2",
@@ -177,7 +179,7 @@
     "rollup": "2.33.3",
     "rollup-plugin-terser": "7.0.2",
     "ts-jest": "26.4.4",
-    "typescript": "npm:@mo36924/typescript-patch@4.1.2",
+    "typescript": "npm:@mo36924/typescript-patch@4.1.3",
     "vscode-languageserver-types": "3.15.1"
   },
   "devDependencies": {}

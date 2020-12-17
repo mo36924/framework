@@ -5,10 +5,10 @@ import { get } from "./get";
 import { querystring } from "./querystring";
 
 export const useQuery: UseQuery = (args: any) => {
-  const qs = querystring(args);
+  const query = querystring(args);
   const graphql = useContext(context).graphql;
 
-  const result = (graphql[qs] ||= get(qs).then((result) => (graphql[qs] = result)));
+  const result = (graphql[query] ||= get(query).then((result) => (graphql[query] = result)));
 
   if (typeof result.then === "function") {
     throw result;

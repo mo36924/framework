@@ -1,9 +1,10 @@
 import type { GraphQLArgs } from "~/types";
+import { encode } from "./encode";
 
 export const querystring = ({ query, variables }: GraphQLArgs) => {
-  const params = new URLSearchParams({ query: query });
+  let params = "query=" + encode(query);
   if (variables) {
-    params.append("variables", JSON.stringify(variables));
+    params += "&variables=" + encode(JSON.stringify(variables));
   }
-  return params.toString();
+  return params;
 };

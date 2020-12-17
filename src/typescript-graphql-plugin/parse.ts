@@ -1,10 +1,10 @@
-import { DocumentNode, parse as _parse, GraphQLError } from "graphql";
+import { DocumentNode, parse as _parse, GraphQLError, Source } from "graphql";
+import { source as _source } from "./source";
 
-let cache: { [query: string]: DocumentNode | GraphQLError } = Object.create(null);
-let count = 0;
+const cache = new WeakMap<Source, DocumentNode | GraphQLError>();
 
-export const parse = (query: string) => {
-  let documentNode = cache[query];
+export const parse = (source: Source) => {
+  let documentNode = cache.get(source);
   if (documentNode) {
     if (documentNode instanceof Error) {
       throw documentNode;
@@ -12,20 +12,13 @@ export const parse = (query: string) => {
     return documentNode;
   }
 
-  if (count > 1000) {
-    cache = Object.create(null);
-    count = 0;
-  }
-
   try {
-    documentNode = _parse(query);
+    documentNode = _parse(source);
   } catch (err) {
-    cache[query] = err;
+    cache.set(source, err);
     throw err;
   }
 
-  cache[query] = documentNode;
-  count++;
-
+  cache.set(source, documentNode);
   return documentNode;
 };

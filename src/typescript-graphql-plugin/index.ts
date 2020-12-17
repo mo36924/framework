@@ -1,6 +1,5 @@
-import { createHash } from "crypto";
-import { FSWatcher, promises, unwatchFile, watch, watchFile } from "fs";
-import { buildSchema, GraphQLSchema, Source } from "graphql";
+import { FSWatcher, readFileSync, unwatchFile, watch, watchFile, writeFileSync } from "fs";
+import { buildSchema, Source } from "graphql";
 import {
   getAutocompleteSuggestions,
   getHoverInformation,
@@ -12,482 +11,185 @@ import type {
   default as ts,
   GetCompletionsAtPositionOptions,
   LanguageService,
-  ScriptKind,
   TaggedTemplateExpression,
 } from "typescript/lib/tsserverlibrary";
-import { CompletionItemKind, DiagnosticSeverity } from "vscode-languageserver-types";
-import { encode } from "./base52";
-import { getDiagnostics } from "./getDiagnostics";
-import { resolveQueryType } from "./resolveQueryType";
-import { resolveSchemaType } from "./resolveSchemaType";
-import { validate } from "./validate";
+import { CompletionItemKind } from "vscode-languageserver-types";
+import { diagnosticCategory } from "./diagnosticCategory";
+import { diagnostics as _diagnostics } from "./diagnostics";
+import { Checker, hook } from "./hook";
+import { hover } from "./hover";
+import { isGraphqlTag } from "./isGraphqlTag";
+import { query as _query } from "./query";
+import { schema as _schema } from "./schema";
+import { sourceFile as _sourceFile } from "./sourceFile";
 
-const { readFile, writeFile, appendFile } = promises;
+const init: ts.server.PluginModuleFactory = ({ typescript: ts }) => {
+  const emptySchema = buildSchema("scalar Unknown");
+  let schema = emptySchema;
+  (ts as any).taggedTemplateExpressionHook = (node: TaggedTemplateExpression, checker: Checker) =>
+    hook(ts, schema, node, checker);
 
-type GraphqlTag = "gql" | "useQuery" | "useMutation";
-
-type GraphqlTagKeys = {
-  [tag in "gql" | "useQuery" | "useMutation"]: {
-    [key: string]: string;
-  };
-};
-
-const isGraphqlTag = (tag: string): tag is GraphqlTag => tag === "gql" || tag === "useQuery" || tag === "useMutation";
-
-class PluginModule implements ts.server.PluginModule {
-  mod: { typescript: typeof ts };
-  ts: typeof ts;
-  languageService!: LanguageService;
-  proxy!: LanguageService;
-  getCurrentDirectory!: () => string;
-  schema?: GraphQLSchema;
-  declaration: string = "";
-  declarationPath: string = "";
-  watcher?: FSWatcher;
-  constructor(mod: { typescript: typeof ts }) {
-    this.mod = mod;
-    this.ts = mod.typescript;
-  }
-  create = (info: ts.server.PluginCreateInfo) => {
-    info.project.getScriptInfoForNormalizedPath;
-    const languageService = info.languageService;
-    const proxy: LanguageService = Object.create(null);
-    for (const [key, value] of Object.entries(languageService)) {
-      (proxy as any)[key] = value.bind(languageService);
+  let watcher: FSWatcher | undefined;
+  let currentDirectory = "/";
+  const onConfigurationChanged = (config: { schema?: string }) => {
+    schema = emptySchema;
+    if (watcher) {
+      watcher.close();
+      watcher = undefined;
     }
-    proxy.getQuickInfoAtPosition = this.getQuickInfoAtPosition;
-    proxy.getCompletionsAtPosition = this.getCompletionsAtPosition;
-    proxy.getSemanticDiagnostics = this.getSemanticDiagnostics;
-    this.languageService = languageService;
-    this.proxy = proxy;
-    this.getCurrentDirectory = info.project.getCurrentDirectory.bind(info.project);
-    this.onConfigurationChanged(info.config);
-    return proxy;
-  };
-  onConfigurationChanged = async (config: { schema?: string }) => {
-    if (this.watcher) {
-      this.watcher.close();
-      this.watcher = undefined;
-    }
-    const schemaPath = config.schema;
-    if (!schemaPath) {
-      this.schema = undefined;
+    const configSchema = config.schema;
+    if (!configSchema) {
       return;
     }
-    const _schemaPath = resolve(this.getCurrentDirectory(), schemaPath);
+    const schemaPath = resolve(currentDirectory, configSchema);
     let schemaCode = "";
     try {
-      schemaCode = await readFile(_schemaPath, "utf8");
+      schemaCode = readFileSync(schemaPath, "utf8");
       schemaCode += "\nscalar Unknown";
     } catch {
-      watchFile(_schemaPath, (stat) => {
+      watchFile(schemaPath, (stat) => {
         if (!stat.isFile()) {
           return;
         }
-        unwatchFile(_schemaPath);
-        this.onConfigurationChanged(config);
+        unwatchFile(schemaPath);
+        onConfigurationChanged(config);
       });
       return;
     }
     try {
-      const schema = buildSchema(new Source(schemaCode, _schemaPath));
-      let declaration = resolveSchemaType(schema);
-      this.schema = schema;
-      const declarationPath = _schemaPath + ".d.ts";
-      const config = await resolveConfig(declarationPath);
-      declaration = format(declaration, { ...config, filepath: declarationPath });
-      this.declaration = declaration;
-      this.declarationPath = declarationPath;
-      await writeFile(declarationPath, declaration);
-      const sourceFiles = this.languageService.getProgram()?.getSourceFiles() || [];
-      for (const sourceFile of sourceFiles) {
-        this.getSemanticDiagnostics(sourceFile.fileName);
-      }
+      const declarationPath = schemaPath + ".d.ts";
+      const config = resolveConfig.sync(declarationPath);
+      const __schema = buildSchema(new Source(schemaCode, schemaPath));
+      const declaration = format(_schema(__schema), { ...config, filepath: declarationPath });
+      writeFileSync(declarationPath, declaration);
+      schema = __schema;
     } catch {}
 
-    this.watcher = watch(_schemaPath, () => {
-      this.onConfigurationChanged(config);
+    watcher = watch(schemaPath, () => {
+      onConfigurationChanged(config);
     });
   };
-  diagnosticCategory = (severity?: number) => {
-    const ts = this.ts;
-    switch (severity) {
-      case DiagnosticSeverity.Error:
-        return ts.DiagnosticCategory.Error;
-      case DiagnosticSeverity.Warning:
-        return ts.DiagnosticCategory.Warning;
-      case DiagnosticSeverity.Information:
-        return ts.DiagnosticCategory.Message;
-      case DiagnosticSeverity.Hint:
-        return ts.DiagnosticCategory.Suggestion;
-      default:
-        return ts.DiagnosticCategory.Error;
-    }
-  };
-  getQuickInfoAtPosition = (fileName: string, position: number) => {
-    const { schema, languageService, ts } = this;
-    if (!schema) {
-      return languageService.getQuickInfoAtPosition(fileName, position);
-    }
-    const sourceFile = languageService.getProgram()?.getSourceFile(fileName);
-    if (!sourceFile) {
-      return undefined;
-    }
-    const node = ts.forEachChild(sourceFile, function visitor(node): true | undefined | TaggedTemplateExpression {
-      if (position < node.pos) {
-        return true;
+  return {
+    create(info) {
+      currentDirectory = info.project.getCurrentDirectory();
+      onConfigurationChanged(info.config);
+      const languageService = info.languageService;
+      const proxy: LanguageService = Object.create(null);
+      for (const [key, value] of Object.entries(languageService)) {
+        (proxy as any)[key] = value.bind(languageService);
       }
-      if (position >= node.end) {
-        return;
-      }
-
-      const result = ts.forEachChild(node, visitor);
-      if (result !== true && result !== undefined) {
-        return result;
-      }
-      if (
-        ts.isTaggedTemplateExpression(node) &&
-        ts.isIdentifier(node.tag) &&
-        isGraphqlTag(node.tag.getText()) &&
-        position >= node.template.getStart()
-      ) {
-        return node;
-      }
-    });
-
-    if (node === true || node === undefined) {
-      return languageService.getQuickInfoAtPosition(fileName, position);
-    }
-
-    const template = node.template;
-    let query = "";
-
-    if (ts.isNoSubstitutionTemplateLiteral(template)) {
-      if (position < template.getStart() + 1 || position >= template.getEnd() - 1) {
-        return languageService.getQuickInfoAtPosition(fileName, position);
-      }
-      // 2 ``
-      const templateWidth = template.getWidth() - 2;
-      query = template.text.padStart(templateWidth);
-    } else {
-      const head = template.head;
-      const templateSpans = template.templateSpans;
-      const templates = templateSpans.map((templateSpan) => templateSpan.literal);
-      const hoverTemplate = [head, ...templates].some(
-        (template) =>
-          position >= template.getStart() + 1 && position < template.getEnd() - (ts.isTemplateTail(template) ? 1 : 2)
-      );
-      if (!hoverTemplate) {
-        return languageService.getQuickInfoAtPosition(fileName, position);
-      }
-
-      // 3 `...${
-      const templateWidth = head.getWidth() - 3;
-      query = head.text.padStart(templateWidth);
-      for (let i = 0, len = templateSpans.length; i < len; i++) {
-        const templateSpan = templateSpans[i];
-        const templateSpanWidth = templateSpan.getFullWidth();
-        const literal = templateSpan.literal;
-        const literalWidth = literal.getWidth();
-        const expressionWidth = templateSpanWidth - literalWidth;
-        const variableName = `$${encode(i)}`;
-        const variable = variableName.padStart(expressionWidth + 2).padEnd(expressionWidth + 3);
-        const templateWidth = literalWidth - (ts.isTemplateTail(literal) ? 2 : 3);
-        const template = literal.text.padStart(templateWidth);
-        query += variable + template;
-      }
-    }
-
-    const tagName = node.tag.getText();
-    let offset = template.getStart() + 1;
-    query = query.replace(/\n|\r/g, " ");
-    if (tagName === "useQuery") {
-      query = `{${query}}`;
-      offset -= 1;
-    } else if (tagName === "useMutation") {
-      query = `mutation{${query}}`;
-      offset -= 9;
-    }
-
-    const cursor = { line: 0, character: position - offset + 1 };
-    const token = getTokenAtPosition(query, cursor);
-    const result = getHoverInformation(schema, query, cursor, token);
-    if (result === "" || typeof result !== "string") {
-      return;
-    }
-    return {
-      kind: ts.ScriptElementKind.string,
-      textSpan: {
-        start: offset + token.start,
-        length: token.end - token.start,
-      },
-      kindModifiers: "",
-      displayParts: [{ text: result, kind: "" }],
-    };
-  };
-  getCompletionsAtPosition = (
-    fileName: string,
-    position: number,
-    options: GetCompletionsAtPositionOptions | undefined
-  ) => {
-    const { schema, languageService, ts } = this;
-    if (!schema) {
-      return languageService.getCompletionsAtPosition(fileName, position, options);
-    }
-    const sourceFile = languageService.getProgram()?.getSourceFile(fileName);
-    if (!sourceFile) {
-      return undefined;
-    }
-    const node = ts.forEachChild(sourceFile, function visitor(node): true | undefined | TaggedTemplateExpression {
-      if (position < node.pos) {
-        return true;
-      }
-      if (position >= node.end) {
-        return;
-      }
-
-      const result = ts.forEachChild(node, visitor);
-      if (result !== true && result !== undefined) {
-        return result;
-      }
-
-      if (
-        ts.isTaggedTemplateExpression(node) &&
-        ts.isIdentifier(node.tag) &&
-        isGraphqlTag(node.tag.getText()) &&
-        position >= node.template.getStart()
-      ) {
-        return node;
-      }
-    });
-
-    if (node === true || node === undefined) {
-      return languageService.getCompletionsAtPosition(fileName, position, options);
-    }
-
-    const template = node.template;
-    let query = "";
-
-    if (ts.isNoSubstitutionTemplateLiteral(template)) {
-      if (position < template.getStart() + 1 || position >= template.getEnd() - 1) {
-        return languageService.getCompletionsAtPosition(fileName, position, options);
-      }
-      // 2 ``
-      const templateWidth = template.getWidth() - 2;
-      query = template.text.padStart(templateWidth);
-    } else {
-      const head = template.head;
-      const templateSpans = template.templateSpans;
-      const templates = templateSpans.map((templateSpan) => templateSpan.literal);
-      const hoverTemplate = [head, ...templates].some(
-        (template) =>
-          position >= template.getStart() + 1 && position < template.getEnd() - (ts.isTemplateTail(template) ? 1 : 2)
-      );
-      if (!hoverTemplate) {
-        return languageService.getCompletionsAtPosition(fileName, position, options);
-      }
-
-      // 3 `...${
-      const templateWidth = head.getWidth() - 3;
-      query = head.text.padStart(templateWidth);
-      for (let i = 0, len = templateSpans.length; i < len; i++) {
-        const templateSpan = templateSpans[i];
-        const templateSpanWidth = templateSpan.getFullWidth();
-        const literal = templateSpan.literal;
-        const literalWidth = literal.getWidth();
-        const expressionWidth = templateSpanWidth - literalWidth;
-        const variableName = `$${encode(i)}`;
-        const variable = variableName.padStart(expressionWidth + 2).padEnd(expressionWidth + 3);
-        const templateWidth = literalWidth - (ts.isTemplateTail(literal) ? 2 : 3);
-        const template = literal.text.padStart(templateWidth);
-        query += variable + template;
-      }
-    }
-
-    const tagName = node.tag.getText();
-    let offset = template.getStart() + 1;
-    query = query.replace(/\n|\r/g, " ");
-    if (tagName === "useQuery") {
-      query = `{${query}}`;
-      offset -= 1;
-    } else if (tagName === "useMutation") {
-      query = `mutation{${query}}`;
-      offset -= 9;
-    }
-
-    const cursor = { line: 0, character: position - offset };
-    const token = getTokenAtPosition(query, cursor);
-    const items = getAutocompleteSuggestions(schema, query, cursor, token);
-    if (!items.length) {
-      return;
-    }
-    return {
-      isGlobalCompletion: false,
-      isMemberCompletion: false,
-      isNewIdentifierLocation: false,
-      entries: items.map((item) => {
-        let kind: ts.ScriptElementKind;
-        switch (item.kind) {
-          case CompletionItemKind.Function:
-          case CompletionItemKind.Constructor:
-            kind = ts.ScriptElementKind.functionElement;
-            break;
-          case CompletionItemKind.Field:
-          case CompletionItemKind.Variable:
-            kind = ts.ScriptElementKind.memberVariableElement;
-            break;
-          default:
-            kind = ts.ScriptElementKind.unknown;
-            break;
+      proxy.getQuickInfoAtPosition = (fileName: string, position: number) => {
+        const sourceFile = _sourceFile(languageService, fileName);
+        if (!sourceFile) {
+          return;
+        }
+        const tag = hover(ts, sourceFile, position);
+        if (!tag) {
+          return languageService.getQuickInfoAtPosition(fileName, position);
+        }
+        const { query, offset } = _query(ts, schema, tag);
+        const cursor = { line: 0, character: position - offset + 1 };
+        const token = getTokenAtPosition(query, cursor);
+        const result = getHoverInformation(schema, query, cursor, token);
+        if (result === "" || typeof result !== "string") {
+          return;
         }
         return {
-          name: item.label,
+          kind: ts.ScriptElementKind.string,
+          textSpan: {
+            start: offset + token.start,
+            length: token.end - token.start,
+          },
           kindModifiers: "",
-          kind,
-          sortText: "",
+          displayParts: [{ text: result, kind: "" }],
         };
-      }),
-    };
-  };
-  getSemanticDiagnostics = (fileName: string) => {
-    const { schema, languageService, ts, diagnosticCategory, updateDeclarationFile } = this;
-    const diagnostics = languageService.getSemanticDiagnostics(fileName);
-    if (!schema) {
-      return diagnostics;
-    }
-    const sourceFile = languageService.getProgram()?.getSourceFile(fileName);
-    if (!sourceFile) {
-      return diagnostics;
-    }
-    const scriptKind: ScriptKind = (sourceFile as any).scriptKind;
-    if ((scriptKind !== ts.ScriptKind.TS && scriptKind !== ts.ScriptKind.TSX) || sourceFile.isDeclarationFile) {
-      return diagnostics;
-    }
-    const graphqlTagKeys: GraphqlTagKeys = {
-      gql: {},
-      useQuery: {},
-      useMutation: {},
-    };
-    ts.forEachChild(sourceFile, function visitor(node) {
-      if (ts.isTaggedTemplateExpression(node)) {
-        const tagNode = node.tag;
-        const tagName = tagNode.getText();
-        if (isGraphqlTag(tagName)) {
-          const template = node.template;
-          const texts: string[] = [];
-          let query = "";
-          let args = "";
-          if (ts.isNoSubstitutionTemplateLiteral(template)) {
-            // 2 ``
-            const templateWidth = template.getWidth() - 2;
-            texts.push(template.text);
-            query = template.text.padStart(templateWidth);
-          } else {
-            const head = template.head;
-            const templateSpans = template.templateSpans;
-
-            // 3 `...${
-            const templateWidth = head.getWidth() - 3;
-            texts.push(head.text);
-            query = head.text.padStart(templateWidth);
-            for (let i = 0, len = templateSpans.length; i < len; i++) {
-              const templateSpan = templateSpans[i];
-              const templateSpanWidth = templateSpan.getFullWidth();
-              const literal = templateSpan.literal;
-              const literalWidth = literal.getWidth();
-              const expressionWidth = templateSpanWidth - literalWidth;
-              const variableName = `$${encode(i)}`;
-              const variable = variableName.padStart(expressionWidth + 2).padEnd(expressionWidth + 3);
-              const templateWidth = literalWidth - (ts.isTemplateTail(literal) ? 2 : 3);
-              const template = literal.text.padStart(templateWidth);
-              texts.push(literal.text);
-              query += variable + template;
-              args += variableName + ":Unknown";
+      };
+      proxy.getCompletionsAtPosition = (
+        fileName: string,
+        position: number,
+        options: GetCompletionsAtPositionOptions | undefined
+      ) => {
+        const sourceFile = _sourceFile(languageService, fileName);
+        if (!sourceFile) {
+          return;
+        }
+        const tag = hover(ts, sourceFile, position);
+        if (!tag) {
+          return languageService.getCompletionsAtPosition(fileName, position, options);
+        }
+        const { query, offset } = _query(ts, schema, tag);
+        const cursor = { line: 0, character: position - offset };
+        const token = getTokenAtPosition(query, cursor);
+        const items = getAutocompleteSuggestions(schema, query, cursor, token);
+        if (!items.length) {
+          return;
+        }
+        return {
+          isGlobalCompletion: false,
+          isMemberCompletion: false,
+          isNewIdentifierLocation: false,
+          entries: items.map((item) => {
+            let kind: ts.ScriptElementKind;
+            switch (item.kind) {
+              case CompletionItemKind.Function:
+              case CompletionItemKind.Constructor:
+                kind = ts.ScriptElementKind.functionElement;
+                break;
+              case CompletionItemKind.Field:
+              case CompletionItemKind.Variable:
+                kind = ts.ScriptElementKind.memberVariableElement;
+                break;
+              default:
+                kind = ts.ScriptElementKind.unknown;
+                break;
             }
-          }
-          let offset = template.getStart() + 1;
-          query = query.replace(/\n|\r/g, " ");
-          if (tagName === "useQuery") {
-            if (args.length) {
-              query = `query(${args}){${query}}`;
-              offset -= args.length + 8;
-            } else {
-              query = `{${query}}`;
-              offset -= 1;
-            }
-          } else if (tagName === "useMutation") {
-            if (args.length) {
-              query = `mutation(${args}){${query}}`;
-              offset -= args.length + 11;
-            } else {
-              query = `mutation{${query}}`;
-              offset -= 9;
-            }
-          }
-          if (tagName === "useQuery" || tagName === "useMutation") {
-            const errors = validate(schema, query);
-            for (const error of errors) {
-              const match = error.message.match(
-                /^Variable ".*?" of type "Unknown" used in position expecting type "(.*?)"\.$/
-              );
-              if (match) {
-                query = query.replace("Unknown", match[1]);
-                offset += 7 - match[1].length;
+            return {
+              name: item.label,
+              kindModifiers: "",
+              kind,
+              sortText: "",
+            };
+          }),
+        };
+      };
+      proxy.getSemanticDiagnostics = (fileName: string) => {
+        const diagnostics = languageService.getSemanticDiagnostics(fileName);
+        const sourceFile = _sourceFile(languageService, fileName);
+        if (!sourceFile) {
+          return diagnostics;
+        }
+        ts.forEachChild(sourceFile, function visitor(node) {
+          if (ts.isTaggedTemplateExpression(node) && ts.isIdentifier(node.tag)) {
+            const tagName = node.tag.text;
+            if (isGraphqlTag(tagName)) {
+              const { query, offset } = _query(ts, schema, node);
+              const graphqlDiagnostics = _diagnostics(schema, query);
+              for (const {
+                range: { start, end },
+                severity,
+                message,
+              } of graphqlDiagnostics) {
+                diagnostics.push({
+                  category: diagnosticCategory(ts, severity),
+                  code: 9999,
+                  messageText: message,
+                  file: sourceFile,
+                  start: start.character + offset,
+                  length: end.character - start.character,
+                });
               }
             }
           }
-          const graphqlDiagnostics = getDiagnostics(query, schema);
-          for (const {
-            range: { start, end },
-            severity,
-            message,
-          } of graphqlDiagnostics) {
-            diagnostics.push({
-              category: diagnosticCategory(severity),
-              code: 9999,
-              messageText: message,
-              file: sourceFile,
-              start: start.character + offset,
-              length: end.character - start.character,
-            });
-          }
-          graphqlTagKeys[tagName][texts.join(" $_ ")] = query;
-        }
-      }
-      ts.forEachChild(node, visitor);
-    });
-    updateDeclarationFile(graphqlTagKeys);
-    return diagnostics;
-  };
-  updateDeclarationFile = async (graphqlTagKeys: GraphqlTagKeys) => {
-    const { schema, declarationPath, declaration } = this;
-    if (!schema) {
-      return;
-    }
-    let _declaration = "";
-    for (const [tag, keys] of Object.entries(graphqlTagKeys)) {
-      for (const [key, query] of Object.entries(keys)) {
-        const queryKey = JSON.stringify(key);
-        const comment = `\n// ${queryKey}\n`;
-        if (declaration.includes(comment)) {
-          continue;
-        }
-        const { values, returnType } = resolveQueryType(schema, query);
-        const typeName = `${tag[0].toUpperCase()}${tag.slice(1)}Types`;
-        _declaration += `${comment}declare module "@mo36924/framework/types" { interface ${typeName} { ${queryKey}: [${values}, ${returnType}] } }\n`;
-      }
-    }
-    if (!_declaration) {
-      return;
-    }
-    const config = await resolveConfig(declarationPath);
-    _declaration = format(_declaration, { ...config, filepath: declarationPath });
-    this.declaration = declaration + _declaration;
-    await appendFile(declarationPath, _declaration);
-  };
-}
+          ts.forEachChild(node, visitor);
+        });
 
-const init: ts.server.PluginModuleFactory = (mod) => new PluginModule(mod);
+        return diagnostics;
+      };
+      return proxy;
+    },
+    onConfigurationChanged,
+  };
+};
 
 export default init;
 

@@ -11,7 +11,7 @@ import {
 } from "graphql";
 import { getType } from "./typeMap";
 
-export function resolveSchemaType(schema: GraphQLSchema) {
+export const schema = (schema: GraphQLSchema) => {
   const typeMap = schema.getTypeMap();
   let schemaType = "declare global { namespace GraphQL {";
   for (const value of Object.values(typeMap)) {
@@ -31,7 +31,7 @@ export function resolveSchemaType(schema: GraphQLSchema) {
   }
   schemaType += "}}";
   return schemaType;
-}
+};
 
 function resolveFieldType({ name, type }: GraphQLInputField) {
   return `${name}:${resolveReturnType(type)};`;

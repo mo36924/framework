@@ -1,25 +1,19 @@
-import { stripIgnoredCharacters } from "graphql";
+import { stripIgnoredCharacters, Source } from "graphql";
+import { source as _source } from "./source";
 
-let cache: { [query: string]: string | undefined } = Object.create(null);
-let count = 0;
+const cache = new WeakMap<Source, Source>();
 
-export const minify = (query: string) => {
-  if (query in cache) {
-    return cache[query];
+export const minify = (source: Source) => {
+  let minifySource = cache.get(source);
+  if (minifySource) {
+    return minifySource;
   }
 
-  if (count > 1000) {
-    cache = Object.create(null);
-    count = 0;
-  }
-
-  let minifyQuery: string | undefined;
+  minifySource = source;
   try {
-    minifyQuery = stripIgnoredCharacters(query);
+    minifySource = _source(stripIgnoredCharacters(source));
   } catch {}
 
-  cache[query] = minifyQuery;
-  count++;
-
-  return minifyQuery;
+  cache.set(source, minifySource);
+  return minifySource;
 };

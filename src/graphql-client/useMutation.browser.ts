@@ -8,7 +8,7 @@ export const useMutation: UseMutation = (args: any) => {
 
   const callback = useCallback(() => {
     setResult({ loading: true });
-    post(body(args)).then((result) => setResult(result));
+    post(body(args)).then(setResult);
   }, [args]);
 
   return [callback, result] as any;

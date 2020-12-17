@@ -1,30 +1,33 @@
 import type { ExecutionResult } from "graphql";
-import type { Join, ToArray } from "./utils";
 
-export type GraphQLArgs<T = {}> = { query: string; variables?: T };
-
-export interface UseQueryTypes {}
-type UseQueryKeys = keyof UseQueryTypes;
-type UseQueryKey<T extends TemplateStringsArray> = Join<ToArray<T>>;
-type UseQueryReturnType<T> = ExecutionResult<T> & { loading?: boolean };
-export type UseQuery = {
-  <T extends TemplateStringsArray>(
-    strings: T,
-    ...values: UseQueryKey<T> extends UseQueryKeys ? UseQueryTypes[UseQueryKey<T>][0] : T[]
-  ): UseQueryKey<T> extends UseQueryKeys ? UseQueryReturnType<UseQueryTypes[UseQueryKey<T>][1]> : unknown;
-  <T = {}>(args: GraphQLArgs<any>): UseQueryReturnType<T>;
+type GraphQLTemplateType = {
+  _values?: any[];
+  _variables?: any;
+  _return?: any;
 };
 
-export interface UseMutationTypes {}
-type UseMutationKeys = keyof UseQueryTypes;
-type UseMutationKey<T extends TemplateStringsArray> = Join<ToArray<T>>;
-type UseMutationReturnType<T> = [() => void, UseQueryReturnType<T>];
+export type GraphQLTemplateStringsArray = TemplateStringsArray & GraphQLTemplateType;
+
+export type GraphQLTemplateValues<T extends GraphQLTemplateType> = T["_values"] extends any[] ? T["_values"] : [];
+
+export type GraphQLExecutionResult<T extends GraphQLTemplateType> = ExecutionResult<
+  T["_return"] extends {} ? T["_return"] : {}
+>;
+
+export type GraphQLArgs = { query: string; variables?: any } & GraphQLTemplateType;
+
+export type UseQueryExecutionResult<T extends GraphQLTemplateType> = GraphQLExecutionResult<T> & {
+  loading: boolean;
+};
+export type UseQuery = {
+  <T extends GraphQLTemplateStringsArray>(strings: T, ...values: GraphQLTemplateValues<T>): UseQueryExecutionResult<T>;
+  <T extends GraphQLArgs>(args: T): UseQueryExecutionResult<T>;
+};
+
+export type UseMutationExecutionResult<T extends GraphQLTemplateType> = [() => void, UseQueryExecutionResult<T>];
 export type UseMutation = {
-  <T extends TemplateStringsArray>(
-    strings: T,
-    ...values: UseMutationKey<T> extends UseMutationKeys ? UseMutationTypes[UseMutationKey<T>][0] : T[]
-  ): UseMutationKey<T> extends UseMutationKeys
-    ? UseMutationReturnType<UseMutationTypes[UseMutationKey<T>][1]>
-    : unknown;
-  <T = {}>(args: GraphQLArgs<any>): UseMutationReturnType<T>;
+  <T extends GraphQLTemplateStringsArray>(strings: T, ...values: GraphQLTemplateValues<T>): UseMutationExecutionResult<
+    T
+  >;
+  <T extends GraphQLArgs>(args: T): UseMutationExecutionResult<T>;
 };
