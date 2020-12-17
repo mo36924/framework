@@ -1,9 +1,21 @@
 import { IncomingMessage, RequestListener, Server as HttpServer, ServerOptions, ServerResponse } from "http";
 import createError, { isHttpError } from "http-errors";
 import { promisify } from "util";
+import type { ComponentType, JSX } from "~/preact-lock";
+import renderToString from "preact-render-to-string";
+import prepass from "@mo36924/preact-ssr-prepass";
 
 export class Request extends IncomingMessage {}
-export class Response extends ServerResponse {}
+export class Response extends ServerResponse {
+  constructor(public request: Request) {
+    super(request);
+  }
+  async render(vnode: JSX.Element) {
+    await prepass(vnode);
+    const html = "<!DOCTYPE html>" + renderToString(vnode);
+    this.end(html);
+  }
+}
 type PromiseOrValue<T> = T | Promise<T>;
 
 export type Plugin<T = any> = (options: T) => MiddlewareFactory;
@@ -11,13 +23,8 @@ export type MiddlewareFactory = (server: Server) => PromiseOrValue<void | Middle
 export type Middleware = (request: Request, response: Response) => PromiseOrValue<void | false>;
 
 export class Server extends HttpServer {
-  constructor(options?: RequestListener | ServerOptions, requestListener?: RequestListener) {
-    super(
-      typeof options === "function"
-        ? { IncomingMessage: Request, ServerResponse: Response }
-        : { ...options, IncomingMessage: Request, ServerResponse: Response },
-      typeof options === "function" ? options : requestListener
-    );
+  constructor(options?: ServerOptions) {
+    super({ ...options, IncomingMessage: Request, ServerResponse: Response });
     this.on("request", this.requestListener);
   }
   middlewareFactories: MiddlewareFactory[] = [];

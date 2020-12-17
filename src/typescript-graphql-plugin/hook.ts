@@ -203,7 +203,7 @@ export const hook = (
   valuesSymbol.type = createTupleType(values, undefined);
   const variablesSymbol = createSymbol(4, "_variables");
   const variablesSymbolTable = createSymbolTable(variables);
-  valuesSymbol.type = createAnonymousType(
+  variablesSymbol.type = createAnonymousType(
     undefined,
     variablesSymbolTable,
     emptyArray,
