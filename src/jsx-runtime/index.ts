@@ -1,3 +1,4 @@
+import "~/types";
 import { jsx as _jsx, Fragment, JSX as JSXInternal } from "preact/jsx-runtime";
 import { Consumer } from "~/context";
 import { styles } from "~/cache";

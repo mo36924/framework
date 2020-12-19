@@ -1,4 +1,3 @@
-export type { default as preact } from "preact";
 export type {
   AnyComponent,
   Attributes,
