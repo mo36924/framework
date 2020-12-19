@@ -1,6 +1,7 @@
 import type * as components from "~/components";
 import type * as graphql from "~/graphql-client";
 import type * as preact from "~/preact-lock";
+import type { Component as _Component } from "~/preact-lock";
 import type { lazy as _lazy } from "~/lazy";
 
 declare global {
@@ -27,30 +28,29 @@ declare global {
     __BASE_URL__,
     __GRAPHQL_ENDPOINT__,
   }: { [key: string]: string | undefined };
-  const {
-    Component,
-    Fragment,
-    cloneElement,
-    createContext,
-    createRef,
-    hydrate,
-    isValidElement,
-    jsx,
-    options,
-    render,
-    toChildArray,
-    useCallback,
-    useContext,
-    useDebugValue,
-    useEffect,
-    useErrorBoundary,
-    useImperativeHandle,
-    useLayoutEffect,
-    useMemo,
-    useReducer,
-    useRef,
-    useState,
-  }: typeof preact;
+  const Component1: typeof _Component;
+  const Component: typeof preact.Component;
+  const Fragment: typeof preact.Fragment;
+  const cloneElement: typeof preact.cloneElement;
+  const createContext: typeof preact.createContext;
+  const createRef: typeof preact.createRef;
+  const hydrate: typeof preact.hydrate;
+  const isValidElement: typeof preact.isValidElement;
+  const jsx: typeof preact.jsx;
+  const options: typeof preact.options;
+  const render: typeof preact.render;
+  const toChildArray: typeof preact.toChildArray;
+  const useCallback: typeof preact.useCallback;
+  const useContext: typeof preact.useContext;
+  const useDebugValue: typeof preact.useDebugValue;
+  const useEffect: typeof preact.useEffect;
+  const useErrorBoundary: typeof preact.useErrorBoundary;
+  const useImperativeHandle: typeof preact.useImperativeHandle;
+  const useLayoutEffect: typeof preact.useLayoutEffect;
+  const useMemo: typeof preact.useMemo;
+  const useReducer: typeof preact.useReducer;
+  const useRef: typeof preact.useRef;
+  const useState: typeof preact.useState;
   const { Body, Head, Html, Meta, Script, Style, Title }: typeof components;
   const { useMutation, useQuery }: typeof graphql;
   const lazy: typeof _lazy;
