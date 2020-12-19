@@ -1,6 +1,6 @@
 {
   "name": "@mo36924/framework",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "Web framework for Node.js",
   "keywords": [],
   "author": "mo36924 <mo36924@users.noreply.github.com>",
@@ -16,8 +16,11 @@
   "publishConfig": {
     "access": "public"
   },
-  "main": "core/index.js",
-  "module": "core/index.mjs",
+  "bin": {
+    "framework": "./bin/index.js"
+  },
+  "main": "./core/index.js",
+  "module": "./core/index.mjs",
   "browser": {
     "./changestate/index.mjs": "./changestate/index.browser.mjs",
     "./components/Body.mjs": "./components/Body.browser.mjs",
@@ -144,6 +147,8 @@
     "@mo36924/preact-ssr-prepass": "1.1.2",
     "@rollup/plugin-babel": "5.2.2",
     "@rollup/plugin-commonjs": "16.0.0",
+    "@rollup/plugin-json": "4.1.0",
+    "@rollup/plugin-node-resolve": "11.0.1",
     "@rollup/plugin-typescript": "6.1.0",
     "@ts-morph/bootstrap": "0.8.0",
     "@types/babel__core": "7.1.12",
@@ -155,6 +160,7 @@
     "babel-plugin-module-resolver": "4.0.0",
     "change-case": "4.1.1",
     "chokidar": "3.4.3",
+    "commander": "6.2.1",
     "cosmiconfig": "7.0.0",
     "cssnano-preset-advanced": "4.0.7",
     "del-cli": "3.0.1",
@@ -178,6 +184,7 @@
     "rollup": "2.33.3",
     "rollup-plugin-terser": "7.0.2",
     "ts-jest": "26.4.4",
+    "tslib": "2.0.3",
     "typescript": "npm:@mo36924/typescript-patch@4.1.3",
     "vscode-languageserver-types": "3.15.1"
   },

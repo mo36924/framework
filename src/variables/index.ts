@@ -1,5 +1,3 @@
-import "~/types";
-
 export const storeId = typeof __STORE_ID__ === "string" ? __STORE_ID__ : "store";
 export const rootId = typeof __ROOT_ID__ === "string" ? __ROOT_ID__ : "root";
 export const styleId = typeof __STYLE_ID__ === "string" ? __STYLE_ID__ : "style";

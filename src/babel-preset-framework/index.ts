@@ -1,4 +1,4 @@
-import "~/types";
+import "~/types/module";
 import type { default as babel, TransformOptions, ConfigAPI } from "@babel/core";
 import presetEnv, { Options as presetEnvOptions } from "@babel/preset-env";
 import presetTypescript from "@babel/preset-typescript";
@@ -105,6 +105,7 @@ export default (_api: Api, options: Options): TransformOptions => {
           mainFields: __NODE__ ? ["module", "main"] : ["browser", "module", "main"],
           conditionNames: __NODE__ ? ["import"] : ["browser", "import"],
           extensions: [".tsx", ".ts", ".jsx", ".mjs", ".js", ".json"],
+          // ignore: [/^\0/], // rollup plugin helper prefix
         } as enhancedResolveOptions,
       ],
       [

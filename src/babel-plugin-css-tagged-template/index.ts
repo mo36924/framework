@@ -1,4 +1,4 @@
-import "~/types";
+import "~/types/module";
 import type { default as babel, PluginObj } from "@babel/core";
 import cssnanoPresetAdvanced from "cssnano-preset-advanced";
 import postcss, { Transformer, Plugin } from "postcss";

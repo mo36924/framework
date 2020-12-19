@@ -1,4 +1,4 @@
-import type {} from "~/preact-lock";
+import type {} from "preact";
 
 declare module "preact" {
   namespace JSX {

@@ -6,6 +6,7 @@
     "declaration": true,
     "declarationMap": true,
     "inlineSourceMap": true,
+    "inlineSources": true,
     "strict": true,
     "moduleResolution": "node",
     "esModuleInterop": true,
@@ -13,7 +14,7 @@
     "forceConsistentCasingInFileNames": true,
     "importsNotUsedAsValues": "error",
     "outDir": ".",
-    "jsx": "react-jsx",
+    "jsx": "preserve",
     "jsxImportSource": "preact",
     "baseUrl": "./src",
     "paths": {

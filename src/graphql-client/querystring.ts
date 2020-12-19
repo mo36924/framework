@@ -1,4 +1,4 @@
-import type { GraphQLArgs } from "~/types";
+import type { GraphQLArgs } from "~/types/graphql";
 import { encode } from "./encode";
 
 export const querystring = ({ query, variables }: GraphQLArgs) => {

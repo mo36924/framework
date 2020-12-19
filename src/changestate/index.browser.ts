@@ -1,5 +1,3 @@
-import "~/types";
-
 if (typeof window !== "undefined" && window.onchangestate === undefined) {
   window.onchangestate = null;
 
@@ -61,3 +59,5 @@ if (typeof window !== "undefined" && window.onchangestate === undefined) {
     } while ((t = t.parentNode));
   });
 }
+
+export {};

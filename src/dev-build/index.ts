@@ -1,4 +1,3 @@
-import "~/types";
 import { patchTypescript } from "./patchTypescript";
 import ts from "./typescript";
 

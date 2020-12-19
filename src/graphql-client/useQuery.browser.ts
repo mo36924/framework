@@ -1,6 +1,6 @@
 import { useEffect, useState } from "~/preact-lock";
 import { graphql } from "~/store";
-import type { UseQuery } from "~/types";
+import type { UseQuery } from "~/types/graphql";
 import { get } from "./get";
 import { querystring } from "./querystring";
 

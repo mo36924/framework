@@ -35,7 +35,8 @@ export const dynamicRoutes: DynamicRoutes = [
 export type RouteContextValue = { url: URL; route: Route; props: Props };
 export const RouteContext = createContext((null as any) as RouteContextValue);
 export const { Provider, Consumer } = RouteContext;
-export const NotFound: Route = lazy(() => Promise.resolve(() => null));
+export const NotFound: Route = () => null;
+NotFound.load = () => Promise.resolve();
 
 export const match = (href: string): RouteContextValue => {
   const url = new URL(href);

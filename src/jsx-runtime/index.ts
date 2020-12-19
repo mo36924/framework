@@ -1,4 +1,3 @@
-import "../types";
 import { jsx as _jsx, Fragment, JSX as JSXInternal } from "preact/jsx-runtime";
 import { Consumer } from "~/context";
 import { styles } from "~/cache";
@@ -29,7 +28,6 @@ const jsx: typeof _jsx = (type: any, props: any, ...args: any[]) => {
     },
   });
 };
-
 type _IntrinsicElements = JSXInternal.IntrinsicElements;
 type __IntrinsicElements = {
   [P in keyof _IntrinsicElements]: Omit<_IntrinsicElements[P], "class">;

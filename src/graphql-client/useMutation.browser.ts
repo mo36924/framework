@@ -1,5 +1,5 @@
 import { useCallback, useState } from "~/preact-lock";
-import type { UseMutation } from "~/types";
+import type { UseMutation } from "~/types/graphql";
 import { body } from "./body";
 import { post } from "./post";
 

@@ -3,7 +3,6 @@ export type {
   AnyComponent,
   Attributes,
   ClassAttributes,
-  Component,
   ComponentChild,
   ComponentChildren,
   ComponentClass,
@@ -30,11 +29,10 @@ export type {
   VNode,
 } from "preact";
 export {
+  Component,
   cloneElement,
   createContext,
-  createElement,
   createRef,
-  h,
   hydrate,
   isValidElement,
   options,
