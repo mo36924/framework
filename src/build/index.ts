@@ -11,6 +11,9 @@ import { rollup } from "rollup";
 import { terser } from "rollup-plugin-terser";
 import { batchWarnings } from "rollup/dist/shared/loadConfigFile";
 import { packageName } from "~/constants";
+import { createRequire } from "module";
+import { fileURLToPath } from "url";
+const systemjsPath = createRequire(fileURLToPath(import.meta.url)).resolve("@mo36924/systemjs/dist/s.js");
 
 export type Options = Pick<PartialConfig, "node" | "browser">;
 
@@ -28,6 +31,7 @@ export default async (options?: Options) => {
       typescript({
         incremental: false,
         target: "ES2020",
+        module: "ESNext",
         declaration: false,
         declarationMap: false,
         sourceMap: true,
@@ -47,7 +51,7 @@ export default async (options?: Options) => {
         configFile: false,
         babelHelpers: "bundled",
         extensions: [".tsx", ".ts", ".mjs", ".jsx", ".js", ".json"],
-        presets: [[framework, {} as FrameworkOptions]],
+        presets: [[framework, { env: "production", target: "node" } as FrameworkOptions]],
       }),
       resolve({
         exportConditions: ["import"],
@@ -66,44 +70,52 @@ export default async (options?: Options) => {
   await build.write({
     dir: node.outDir,
     format: "module",
-    entryFileNames: "node.js",
+    entryFileNames: "index.js",
     interop: "auto",
     compact: true,
     sourcemap: true,
   });
 
+  for (const type of Object.keys(browserslists)) {
+    const build = await rollup({
+      input: browser.entry,
+      preserveEntrySignatures: false,
+      onwarn: warnings.add,
+      plugins: [
+        typescript({
+          target: "ES2020",
+        }),
+        babel({
+          babelrc: false,
+          configFile: false,
+          babelHelpers: "bundled",
+          extensions: [".tsx", ".ts", ".mjs", ".jsx", ".js", ".json"],
+          presets: [[framework, { env: "development", target: type } as FrameworkOptions]],
+        }),
+        resolve({
+          exportConditions: ["browser", "import"],
+          browser: true,
+          mainFields: ["browser", "module", "main"],
+        }),
+        commonjs({
+          ignoreGlobal: true,
+        }),
+        terser({
+          ecma: 2020,
+        }),
+      ],
+    });
+
+    await build.write({
+      dir: browser.outDir,
+      format: type === "nomodule" ? "system" : "module",
+      entryFileNames: `${type}.js`,
+      interop: "auto",
+      compact: true,
+    });
+  }
+
+  const systemjsBuild = await rollup({ input: systemjsPath, onwarn: warnings.add });
+  systemjsBuild.write({ dir: browser.outDir, interop: "auto", compact: true });
   warnings.flush();
-
-  // for (const type of Object.keys(browserslists)) {
-  //   const build = await rollup({
-  //     input: browser.entry,
-  //     preserveEntrySignatures: false,
-  //     plugins: [
-  //       typescript({
-  //         target: "ES2020",
-  //       }),
-  //       babel({
-  //         babelrc: false,
-  //         configFile: false,
-  //         babelHelpers: "bundled",
-  //         extensions: [".tsx", ".ts", ".mjs", ".jsx", ".js", ".json"],
-  //         presets: [[framework, { env: "production", target: type } as FrameworkOptions]],
-  //       }),
-  //       commonjs({
-  //         ignoreGlobal: true,
-  //       }),
-  //       terser({
-  //         ecma: 2020,
-  //       }),
-  //     ],
-  //   });
-
-  //   await build.write({
-  //     dir: browser.outDir,
-  //     format: "module",
-  //     entryFileNames: `${type}.js`,
-  //     interop: "auto",
-  //     compact: true,
-  //   });
-  // }
 };

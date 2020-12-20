@@ -4,21 +4,21 @@ import { routeGenerator } from "~/route-generator";
 import { packageName } from "~/constants";
 import build from "~/build";
 
-program
-  .name(packageName)
-  .usage("[options]")
-  .option("-b, --build", "build project")
-  .option("-d, --dev", "development mode")
-  .parse(process.argv);
+program.name("framework").usage("command");
 
-(async () => {
-  if (program.build) {
+program
+  .command("build")
+  .description("build project")
+  .action(async () => {
     await routeGenerator();
     await build();
-    return;
-  }
-  if (program.dev) {
+  });
+
+program
+  .command("dev")
+  .description("dev project")
+  .action(async () => {
     routeGenerator({ watch: true });
-    return;
-  }
-})();
+  });
+
+program.parse(process.argv);
