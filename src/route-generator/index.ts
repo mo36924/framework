@@ -6,7 +6,7 @@ import { format as prettierFormat, resolveConfig } from "~/prettier-module";
 import { packageName } from "~/constants";
 import { PartialConfig, getConfig } from "~/config";
 
-export type Options = PartialConfig["route-generator"];
+export type Options = PartialConfig["routeGenerator"];
 
 const defaultTemplate = `
 import { createContext, Component, ComponentType } from "${packageName}";
@@ -86,7 +86,7 @@ export default class Router extends Component<{ href: string }, RouteContextValu
 export async function routeGenerator(options?: Options) {
   const config = await getConfig();
   const { watch: watchMode, routeDir, component, template, include, exclude } = {
-    ...config["route-generator"],
+    ...config.routeGenerator,
     ...options,
   };
 

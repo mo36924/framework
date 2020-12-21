@@ -12,6 +12,7 @@ program
   .action(async () => {
     await routeGenerator();
     await build();
+    process.exit(process.exitCode);
   });
 
 program

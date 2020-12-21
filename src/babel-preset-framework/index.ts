@@ -135,7 +135,7 @@ export default (_api: Api, options: Options): TransformOptions => {
           Html: [packageName, "Html"],
           Meta: [packageName, "Meta"],
           Title: [packageName, "Title"],
-          Router: [resolve(config["route-generator"].component), "default"],
+          Router: [resolve(config.routeGenerator.component), "default"],
           fetch: [packageName, "fetch"],
           Headers: [packageName, "Headers"],
           Request: [packageName, "Request"],

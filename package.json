@@ -1,6 +1,6 @@
 {
   "name": "@mo36924/framework",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "description": "Web framework for Node.js",
   "keywords": [],
   "author": "mo36924 <mo36924@users.noreply.github.com>",
@@ -145,7 +145,7 @@
     "@babel/preset-react": "7.12.10",
     "@babel/preset-typescript": "7.12.7",
     "@mo36924/preact-ssr-prepass": "1.1.2",
-    "@mo36924/systemjs": "6.8.2",
+    "@mo36924/systemjs": "6.8.3",
     "@rollup/plugin-babel": "5.2.2",
     "@rollup/plugin-commonjs": "16.0.0",
     "@rollup/plugin-json": "4.1.0",

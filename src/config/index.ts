@@ -3,20 +3,15 @@ import type { DeepPartial } from "~/types/utils";
 import { cosmiconfig, cosmiconfigSync } from "cosmiconfig";
 import type { CosmiconfigResult } from "cosmiconfig/dist/types";
 import { basename } from "path";
-import { existsSync } from "fs";
 
 const defaultConfig = {
   filepath: "package.json",
-  node: {
-    entry: existsSync("node/index.tsx") ? "node/index.tsx" : "node/index.ts",
-    outDir: "dist",
-  },
-  browser: {
-    entry: existsSync("browser/index.tsx") ? "browser/index.tsx" : "browser/index.ts",
-    outDir: "public",
-  },
+  node: "node/index.tsx",
+  browser: "browser/index.tsx",
+  outDir: "dist",
+  publicDir: "public",
   variables: {},
-  "route-generator": {
+  routeGenerator: {
     watch: !!process.env.NODE_ENV,
     routeDir: "routes",
     component: "components/Router.tsx",
