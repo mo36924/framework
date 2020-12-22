@@ -26,7 +26,7 @@ export default async (options?: Options) => {
   const { node, browser, outDir, publicDir } = mergeConfig(config, options);
   const warnings = batchWarnings();
 
-  await Promise.all([mkdir(dirname(node)), mkdir(dirname(browser))]);
+  await Promise.all([mkdir(dirname(node), { recursive: true }), mkdir(dirname(browser), { recursive: true })]);
   await Promise.allSettled([writeFile(node, "", { flag: "wx" }), writeFile(browser, "", { flag: "wx" })]);
 
   const build = await rollup({
