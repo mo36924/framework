@@ -12,14 +12,14 @@ import * as variables from "~/variables";
 import { resolve } from "path";
 
 import { packageName } from "~/constants";
-import { modern, module, nomodule } from "~/browserslists";
+import { module, nomodule } from "~/browserslists";
 import { getConfigSync } from "~/config";
 
 type Api = ConfigAPI & typeof babel;
 
 export type Options = {
   env?: "production" | "development" | "test";
-  target?: "node" | "modern" | "module" | "nomodule";
+  target?: "node" | "module" | "nomodule";
 };
 
 export default (_api: Api, options: Options): TransformOptions => {
@@ -30,7 +30,6 @@ export default (_api: Api, options: Options): TransformOptions => {
   const __TEST__ = _env === "test" || undefined;
   const __NODE__ = target === "node" || undefined;
   const __BROWSER__ = !__NODE__ || undefined;
-  const __MODERN__ = target === "modern" || undefined;
   const __MODULE__ = target === "module" || undefined;
   const __NOMODULE__ = target === "nomodule" || undefined;
   const config = getConfigSync();
@@ -54,8 +53,6 @@ export default (_api: Api, options: Options): TransformOptions => {
             ? {
                 node: true,
               }
-            : __MODERN__
-            ? modern
             : __MODULE__
             ? module
             : __NOMODULE__

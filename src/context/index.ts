@@ -15,7 +15,7 @@ export type ContextValue = {
 };
 export const defaultContextValue = (): ContextValue => ({
   url: "/",
-  type: "modern",
+  type: "module",
   classes: createObjectNull(),
   graphql: createObjectNull(),
   prepass: true,

@@ -88,13 +88,13 @@ declare global {
   const __TEST__: true | undefined;
   const __NODE__: true | undefined;
   const __BROWSER__: true | undefined;
-  const __MODERN__: true | undefined;
   const __MODULE__: true | undefined;
   const __NOMODULE__: true | undefined;
 
-  const __STORE_ID__: string | undefined;
   const __ROOT_ID__: string | undefined;
   const __STYLE_ID__: string | undefined;
+  const __CLASSES_ID__: string | undefined;
+  const __GRAPHQL_ID__: string | undefined;
   const __BASE_URL__: string | undefined;
   const __GRAPHQL_ENDPOINT__: string | undefined;
 

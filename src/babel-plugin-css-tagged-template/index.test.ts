@@ -23,12 +23,9 @@ test("babel-plugin-css-tagged-template", async () => {
     const _css2 = _css(
       typeof self === "undefined"
         ? (_0) => ({
-            modern: \`.\${_0}{width:10px}\`,
             module: \`.\${_0}{width:10px}\`,
             nomodule: \`.\${_0}{width:10px}\`,
           })
-        : typeof __MODERN__ !== "undefined"
-        ? (_0) => [\`.\${_0}{width:10px}\`]
         : typeof __MODULE__ !== "undefined"
         ? (_0) => [\`.\${_0}{width:10px}\`]
         : (_0) => [\`.\${_0}{width:10px}\`],
@@ -52,12 +49,9 @@ test("babel-plugin-css-tagged-template", async () => {
     const _css2 = _css(
       typeof self === "undefined"
         ? (_0) => ({
-            modern: \`.\${_0}{width:10px}\`,
             module: \`.\${_0}{width:10px}\`,
             nomodule: \`.\${_0}{width:10px}\`,
           })
-        : typeof __MODERN__ !== "undefined"
-        ? (_0) => [\`.\${_0}{width:10px}\`]
         : typeof __MODULE__ !== "undefined"
         ? (_0) => [\`.\${_0}{width:10px}\`]
         : (_0) => [\`.\${_0}{width:10px}\`],
@@ -84,12 +78,9 @@ test("babel-plugin-css-tagged-template", async () => {
     const _css2 = _css(
       typeof self === "undefined"
         ? (_0, _1) => ({
-            modern: \`.\${_0}{height:\${_1}px;width:10px}\`,
             module: \`.\${_0}{height:\${_1}px;width:10px}\`,
             nomodule: \`.\${_0}{height:\${_1}px;width:10px}\`,
           })
-        : typeof __MODERN__ !== "undefined"
-        ? (_0, _1) => [\`.\${_0}{height:\${_1}px;width:10px}\`]
         : typeof __MODULE__ !== "undefined"
         ? (_0, _1) => [\`.\${_0}{height:\${_1}px;width:10px}\`]
         : (_0, _1) => [\`.\${_0}{height:\${_1}px;width:10px}\`],
@@ -123,12 +114,9 @@ test("babel-plugin-css-tagged-template", async () => {
     const _css2 = _css(
       typeof self === "undefined"
         ? (_0, _1) => ({
-            modern: \`.\${_0}{height:\${_1}px;width:10px}\`,
             module: \`.\${_0}{height:\${_1}px;width:10px}\`,
             nomodule: \`.\${_0}{height:\${_1}px;width:10px}\`,
           })
-        : typeof __MODERN__ !== "undefined"
-        ? (_0, _1) => [\`.\${_0}{height:\${_1}px;width:10px}\`]
         : typeof __MODULE__ !== "undefined"
         ? (_0, _1) => [\`.\${_0}{height:\${_1}px;width:10px}\`]
         : (_0, _1) => [\`.\${_0}{height:\${_1}px;width:10px}\`],
@@ -138,12 +126,9 @@ test("babel-plugin-css-tagged-template", async () => {
     const _css3 = _css(
       typeof self === "undefined"
         ? (_0, _1, _2) => ({
-            modern: \`.\${_0}{height:\${_2}px;width:\${_1}px}\`,
             module: \`.\${_0}{height:\${_2}px;width:\${_1}px}\`,
             nomodule: \`.\${_0}{height:\${_2}px;width:\${_1}px}\`,
           })
-        : typeof __MODERN__ !== "undefined"
-        ? (_0, _1, _2) => [\`.\${_0}{height:\${_2}px;width:\${_1}px}\`]
         : typeof __MODULE__ !== "undefined"
         ? (_0, _1, _2) => [\`.\${_0}{height:\${_2}px;width:\${_1}px}\`]
         : (_0, _1, _2) => [\`.\${_0}{height:\${_2}px;width:\${_1}px}\`],
@@ -177,12 +162,9 @@ test("babel-plugin-css-tagged-template", async () => {
     const _css2 = _css(
       typeof self === "undefined"
         ? (_0, _1, _2) => ({
-            modern: \`.\${_0}{height:\${_1}px;width:10px}.\${_0}:before{width:\${_2}px}\`,
             module: \`.\${_0}{height:\${_1}px;width:10px}.\${_0}:before{width:\${_2}px}\`,
             nomodule: \`.\${_0}{height:\${_1}px;width:10px}.\${_0}:before{width:\${_2}px}\`,
           })
-        : typeof __MODERN__ !== "undefined"
-        ? (_0, _1, _2) => [\`.\${_0}{height:\${_1}px;width:10px}\`, \`.\${_0}:before{width:\${_2}px}\`]
         : typeof __MODULE__ !== "undefined"
         ? (_0, _1, _2) => [\`.\${_0}{height:\${_1}px;width:10px}\`, \`.\${_0}:before{width:\${_2}px}\`]
         : (_0, _1, _2) => [\`.\${_0}{height:\${_1}px;width:10px}\`, \`.\${_0}:before{width:\${_2}px}\`],

@@ -69,7 +69,7 @@ const templateCss = (styles: string[], wrapper = "_") => {
 
 const compileCss = (
   uncompiledCss: string,
-  plugins: Transformer[] = browserslistsPlugins.modern,
+  plugins: Transformer[] = browserslistsPlugins.module,
   separator: string = ""
 ) =>
   postcss(separator ? [...plugins, splitRulePlugin({ separator })] : plugins)
@@ -78,7 +78,7 @@ const compileCss = (
 
 const compileRules = (
   uncompiledCss: string,
-  plugins: Transformer[] = browserslistsPlugins.modern,
+  plugins: Transformer[] = browserslistsPlugins.module,
   separator: string = ""
 ) => compileCss(uncompiledCss, plugins, separator).split(separator);
 
@@ -161,19 +161,11 @@ export default (
           t.conditionalExpression(
             t.binaryExpression(
               "!==",
-              t.unaryExpression("typeof", t.identifier("__MODERN__")),
+              t.unaryExpression("typeof", t.identifier("__MODULE__")),
               t.stringLiteral("undefined")
             ),
-            rulesFactories.modern,
-            t.conditionalExpression(
-              t.binaryExpression(
-                "!==",
-                t.unaryExpression("typeof", t.identifier("__MODULE__")),
-                t.stringLiteral("undefined")
-              ),
-              rulesFactories.module,
-              rulesFactories.nomodule
-            )
+            rulesFactories.module,
+            rulesFactories.nomodule
           )
         );
 

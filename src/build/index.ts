@@ -14,6 +14,9 @@ import { packageName } from "~/constants";
 import { createRequire } from "module";
 import { fileURLToPath } from "url";
 import rollupPluginTypescript from "~/rollup-plugin-typescript";
+import { dirname, join } from "path";
+import { mkdir, writeFile } from "fs/promises";
+import ts from "typescript";
 const systemjsPath = createRequire(fileURLToPath(import.meta.url)).resolve("@mo36924/systemjs/dist/s.min.js");
 
 export type Options = Pick<PartialConfig, "node" | "browser">;
@@ -22,6 +25,9 @@ export default async (options?: Options) => {
   const config = await getConfig();
   const { node, browser, outDir, publicDir } = mergeConfig(config, options);
   const warnings = batchWarnings();
+
+  await Promise.all([mkdir(dirname(node)), mkdir(dirname(browser))]);
+  await Promise.allSettled([writeFile(node, "", { flag: "wx" }), writeFile(browser, "", { flag: "wx" })]);
 
   const build = await rollup({
     input: node,
@@ -42,7 +48,7 @@ export default async (options?: Options) => {
         strict: true,
         esModuleInterop: true,
         moduleResolution: "node",
-        outDir: undefined,
+        outDir: outDir,
         jsx: "preserve",
         jsxImportSource: packageName,
       }),
@@ -81,6 +87,7 @@ export default async (options?: Options) => {
   });
 
   for (const type of Object.keys(browserslists)) {
+    const isNoModule = type === "nomodule";
     const build = await rollup({
       input: browser,
       preserveEntrySignatures: false,
@@ -99,7 +106,7 @@ export default async (options?: Options) => {
           strict: true,
           esModuleInterop: true,
           moduleResolution: "node",
-          outDir: undefined,
+          outDir: publicDir,
           jsx: "preserve",
           jsxImportSource: packageName,
         }),
@@ -109,7 +116,10 @@ export default async (options?: Options) => {
         commonjs({
           ignoreGlobal: true,
         }),
-        rollupPluginTypescript(type === "nomodule"),
+        rollupPluginTypescript({
+          target: isNoModule ? ts.ScriptTarget.ES5 : ts.ScriptTarget.ES2017,
+          downlevelIteration: isNoModule,
+        }),
         babel({
           babelrc: false,
           configFile: false,
@@ -124,7 +134,7 @@ export default async (options?: Options) => {
           extensions: [".tsx", ".ts", ".jsx", ".mjs", ".js", ".cjs", ".json", ".node"],
         }),
         terser({
-          ecma: type === "nomodule" ? 5 : 2017,
+          ecma: isNoModule ? 5 : 2017,
           safari10: true,
         }),
       ],
@@ -132,14 +142,14 @@ export default async (options?: Options) => {
 
     await build.write({
       dir: publicDir,
-      format: type === "nomodule" ? "system" : "module",
-      entryFileNames: `${type}.js`,
+      format: isNoModule ? "system" : "module",
+      entryFileNames: isNoModule ? `nomodule.js` : "index.js",
       interop: "auto",
       compact: true,
     });
   }
 
   const systemjsBuild = await rollup({ input: systemjsPath, onwarn: warnings.add, plugins: [terser()] });
-  systemjsBuild.write({ dir: publicDir, interop: "auto", compact: true });
+  systemjsBuild.write({ file: join(publicDir, "s.js"), interop: "auto", compact: true });
   warnings.flush();
 };

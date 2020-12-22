@@ -22,12 +22,9 @@ describe("babel-preset", () => {
       const _css3 = _css(
         typeof self === "undefined"
           ? (_0) => ({
-              modern: \`.\${_0}{width:10px}\`,
               module: \`.\${_0}{width:10px}\`,
               nomodule: \`.\${_0}{width:10px}\`,
             })
-          : typeof __MODERN__ !== "undefined"
-          ? (_0) => [\`.\${_0}{width:10px}\`]
           : typeof __MODULE__ !== "undefined"
           ? (_0) => [\`.\${_0}{width:10px}\`]
           : (_0) => [\`.\${_0}{width:10px}\`],

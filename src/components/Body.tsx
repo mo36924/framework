@@ -1,8 +1,7 @@
 import jsesc from "jsesc";
 import type { ComponentChildren } from "~/preact-lock";
-import { rootId, storeId } from "~/variables";
+import { rootId, classesId, graphqlId } from "~/variables";
 import { Consumer } from "~/context";
-import type { Store } from "~/store";
 
 export type BodyProps = {
   children?: ComponentChildren;
@@ -15,19 +14,29 @@ export const Body = (props: BodyProps) => (
         return <>{props.children}</>;
       }
 
-      const store: Store = { classes: value.classes, graphql: value.graphql };
-
-      const storeJson = {
-        __html: jsesc(store, {
-          isScriptContext: true,
-          json: true,
-        }),
-      };
-
       return (
         <body>
           <div id={rootId}>{props.children}</div>
-          <script id={storeId} type="application/json" dangerouslySetInnerHTML={storeJson} />
+          <script
+            id={classesId}
+            type="application/json"
+            dangerouslySetInnerHTML={{
+              __html: jsesc(value.classes, {
+                isScriptContext: true,
+                json: true,
+              }),
+            }}
+          />
+          <script
+            id={graphqlId}
+            type="application/json"
+            dangerouslySetInnerHTML={{
+              __html: jsesc(value.graphql, {
+                isScriptContext: true,
+                json: true,
+              }),
+            }}
+          />
         </body>
       );
     }}

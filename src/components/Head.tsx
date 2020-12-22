@@ -16,10 +16,7 @@ export const Head = (props: HeadProps) => (
       }
 
       const type = value.type;
-      const scriptSrc = `/${type}.js`;
       const isNoModule = type === "nomodule";
-      const scriptType = isNoModule ? undefined : "module";
-      const scriptNoModule = isNoModule || undefined;
       const styleContent = {
         __html: jsesc(
           Object.values(value.classes)
@@ -29,12 +26,20 @@ export const Head = (props: HeadProps) => (
         ),
       };
 
-      return (
+      return isNoModule ? (
         <head>
           <meta charSet="utf-8" />
-          {isNoModule ? <meta httpEquiv="X-UA-Compatible" content="IE=edge" /> : null}
+          <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
           {props.children}
-          <script src={scriptSrc} type={scriptType} noModule={scriptNoModule} defer={scriptNoModule} />
+          <script src="/s.js" defer />
+          <script src="/nomodule.js" defer id="main" />
+          <style id={styleId} dangerouslySetInnerHTML={styleContent} />
+        </head>
+      ) : (
+        <head>
+          <meta charSet="utf-8" />
+          {props.children}
+          <script src="/index.js" type="module" />
           <style id={styleId} dangerouslySetInnerHTML={styleContent} />
         </head>
       );
