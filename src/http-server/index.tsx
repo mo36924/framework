@@ -127,8 +127,10 @@ export class Response extends ServerResponse {
     super(request);
   }
   async render(vnode: JSX.Element) {
-    const app = <Provider value={defaultContextValue()}>{vnode}</Provider>;
+    const value = defaultContextValue();
+    const app = <Provider value={value}>{vnode}</Provider>;
     await prepass(app);
+    value.prepass = false;
     const html = "<!DOCTYPE html>" + renderToString(app);
     this.end(html);
   }

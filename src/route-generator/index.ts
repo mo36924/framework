@@ -64,9 +64,9 @@ export default (props: { href: string }) => {
       const context = match(location.href);
       context.route.load().then(() => setState(context));
     }
-    addEventListener("changestate", handleChangestate);
+    addEventListener(changestate, handleChangestate);
     return () => {
-      removeEventListener("changestate", handleChangestate);
+      removeEventListener(changestate, handleChangestate);
     }
   }, [])
   return (

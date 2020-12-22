@@ -1,3 +1,5 @@
-import type { TitleProps } from "./Title";
-export type { TitleProps } from "./Title";
-export const Title = (props: TitleProps) => <title>{props.children}</title>;
+import type { Props } from "./Title";
+export const Title = (props: Props) => {
+  document.title = props.children;
+  return null;
+};

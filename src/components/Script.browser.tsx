@@ -1,3 +1,2 @@
-import type { ScriptProps } from "./Script";
-export type { ScriptProps } from "./Script";
-export const Script = (props: ScriptProps) => null;
+import type { Props } from "./Script";
+export const Script = (props: Props) => null;

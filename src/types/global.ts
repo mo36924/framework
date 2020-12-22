@@ -1,3 +1,4 @@
+import type { changestate as _changestate } from "~/changestate";
 import type {
   AnyComponent as _AnyComponent,
   Attributes as _Attributes,
@@ -59,19 +60,12 @@ import type {
 import type { lazy as _lazy } from "~/lazy";
 import type {
   Body as _Body,
-  BodyProps as _BodyProps,
   Head as _Head,
-  HeadProps as _HeadProps,
   Html as _Html,
-  HtmlProps as _HtmlProps,
   Meta as _Meta,
-  MetaProps as _MetaProps,
   Script as _Script,
-  ScriptProps as _ScriptProps,
   Style as _Style,
-  StyleProps as _StyleProps,
   Title as _Title,
-  TitleProps as _TitleProps,
 } from "~/components";
 import type { useMutation as _useMutation, useQuery as _useQuery } from "~/graphql-client";
 
@@ -83,6 +77,7 @@ declare global {
     changestate: Event;
   }
 
+  const changestate: typeof _changestate;
   const __PROD__: true | undefined;
   const __DEV__: true | undefined;
   const __TEST__: true | undefined;
@@ -158,19 +153,12 @@ declare global {
   const lazy: typeof _lazy;
 
   const Body: typeof _Body;
-  type BodyProps = _BodyProps;
   const Head: typeof _Head;
-  type HeadProps = _HeadProps;
   const Html: typeof _Html;
-  type HtmlProps = _HtmlProps;
   const Meta: typeof _Meta;
-  type MetaProps = _MetaProps;
   const Script: typeof _Script;
-  type ScriptProps = _ScriptProps;
   const Style: typeof _Style;
-  type StyleProps = _StyleProps;
   const Title: typeof _Title;
-  type TitleProps = _TitleProps;
 
   const useMutation: typeof _useMutation;
   const useQuery: typeof _useQuery;

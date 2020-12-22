@@ -1,8 +1,4 @@
-export type TitleProps = {
+export type Props = {
   children: string;
 };
-
-export const Title = (props: TitleProps) => {
-  document.title = props.children;
-  return null;
-};
+export const Title = (props: Props) => <title>{props.children}</title>;

@@ -1,7 +1,6 @@
-import type { HtmlProps } from "./Html";
-export type { HtmlProps } from "./Html";
+import type { Props } from "./Html";
 
-export const Html = ({ lang, id, className, children }: HtmlProps) => {
+export const Html = ({ lang, id, className, children }: Props) => {
   const html = document.documentElement;
 
   if (lang) {
@@ -22,5 +21,5 @@ export const Html = ({ lang, id, className, children }: HtmlProps) => {
     html.removeAttribute("className");
   }
 
-  return <>{children}</>;
+  return children;
 };

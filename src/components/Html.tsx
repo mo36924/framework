@@ -1,6 +1,6 @@
 import type { ComponentChildren } from "~/preact-lock";
 
-export type HtmlProps = {
+export type Props = {
   lang?:
     | "aa"
     | "ab"
@@ -191,7 +191,7 @@ export type HtmlProps = {
   children?: ComponentChildren;
 };
 
-export const Html = (props: HtmlProps) => (
+export const Html = (props: Props) => (
   <html lang={props.lang} id={props.id} className={props.className}>
     {props.children}
   </html>

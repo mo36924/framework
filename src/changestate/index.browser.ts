@@ -1,3 +1,6 @@
+import { changestate } from "./index";
+export { changestate };
+
 if (typeof window !== "undefined" && window.onchangestate === undefined) {
   window.onchangestate = null;
 
@@ -25,7 +28,7 @@ if (typeof window !== "undefined" && window.onchangestate === undefined) {
 
   [...events, "popstate"].forEach((type) => {
     addEventListener(type.toLowerCase(), () => {
-      const event = createEvent("changestate");
+      const event = createEvent(changestate);
       dispatchEvent(event);
 
       if (typeof window.onchangestate === "function") {
