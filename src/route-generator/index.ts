@@ -9,7 +9,6 @@ import { PartialConfig, getConfig } from "~/config";
 export type Options = PartialConfig["routeGenerator"];
 
 const defaultTemplate = `
-import { createContext, Component, ComponentType } from "${packageName}";
 /**__imports__**/
 
 type Props = { [key: string]: string };
@@ -58,28 +57,23 @@ export const match = (href: string): RouteContextValue => {
   return { url, route, props };
 };
 
-export default class Router extends Component<{ href: string }, RouteContextValue> {
-  constructor(props: { href: string }) {
-    super(props);
-    this.state = match(props.href);
-  }
-  componentDidMount() {
-    addEventListener("changestate", this.handleChangestate);
-  }
-  componentWillUnmount() {
-    removeEventListener("changestate", this.handleChangestate);
-  }
-  handleChangestate = () => {
-    const context = match(location.href);
-    context.route.load().then(() => this.setState(context));
-  };
-  render() {
-    return (
-      <Provider value={this.state}>
-        <this.state.route {...this.state.props} />
-      </Provider>
-    );
-  }
+export default (props: { href: string }) => {
+  const [state, setState] = useState(match(props.href))
+  useEffect(() => {
+    const handleChangestate = () => {
+      const context = match(location.href);
+      context.route.load().then(() => setState(context));
+    }
+    addEventListener("changestate", handleChangestate);
+    return () => {
+      removeEventListener("changestate", handleChangestate);
+    }
+  }, [])
+  return (
+    <Provider value={state}>
+      <state.route {...state.props} />
+    </Provider>
+  );
 }
 `;
 

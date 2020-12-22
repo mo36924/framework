@@ -150,6 +150,6 @@ export default async (options?: Options) => {
   }
 
   const systemjsBuild = await rollup({ input: systemjsPath, onwarn: warnings.add, plugins: [terser()] });
-  systemjsBuild.write({ file: join(publicDir, "s.js"), interop: "auto", compact: true });
+  await systemjsBuild.write({ file: join(publicDir, "s.js"), interop: "auto", compact: true });
   warnings.flush();
 };

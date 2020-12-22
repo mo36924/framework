@@ -102,7 +102,7 @@ export default (_api: Api, options: Options): TransformOptions => {
           mainFields: __NODE__ ? ["module", "main"] : ["browser", "module", "main"],
           conditionNames: __NODE__ ? ["import"] : ["browser", "import"],
           extensions: [".tsx", ".ts", ".jsx", ".mjs", ".js", ".json"],
-          // ignore: [/^\0/], // rollup plugin helper prefix
+          ignore: [/^\0/], // rollup plugin helper prefix
         } as enhancedResolveOptions,
       ],
       [

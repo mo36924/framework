@@ -31,7 +31,7 @@ export async function babelTransformFile(path: string, data: string, writeByteOr
     filename: path,
     presets: [
       [babelPresetEnv, { modules: false, targets: { node: true }, bugfixes: true }],
-      [babelPresetReact, { runtime: "automatic", useSpread: true }],
+      [babelPresetReact, { runtime: "automatic", importSource: "preact", useSpread: true }],
     ],
     plugins: [[babelPluginReplaceImportExtensions, { ".ts": ".mjs", ".tsx": ".mjs" }]],
   });
